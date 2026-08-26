@@ -1,0 +1,27 @@
+# Ignore sensitive files
+config.php
+
+# SQL files are tracked for database setup
+# *.sql
+# *.sqlite
+# *.db
+
+# IDE/Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node.js (falls später benötigt)
+node_modules/
+package-lock.json
+
+# Cache
+*.cache
