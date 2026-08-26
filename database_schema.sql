@@ -1,5 +1,6 @@
 -- Datenbank-Schema für die Kanadierrennen-Webanwendung
 -- MariaDB SQL-Dump
+-- Version: 2.0 (mit IF NOT EXISTS für alle Objekte)
 
 -- Datenbank erstellen
 CREATE DATABASE IF NOT EXISTS `strafe_2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -107,88 +108,10 @@ INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
 ('start_interval_minutes', '10'),
 ('reservation_start_date', DATE_SUB('2025-06-21', INTERVAL 6 WEEK));
 
--- Trigger für Audit-Log
-DELIMITER //
-
-CREATE TRIGGER after_team_insert
-AFTER INSERT ON teams
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'teams', NEW.id, 
-            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email), 
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_team_update
-AFTER UPDATE ON teams
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'teams', NEW.id,
-            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
-            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_team_delete
-AFTER DELETE ON teams
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'DELETE', 'teams', OLD.id,
-            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_start_times_insert
-AFTER INSERT ON start_times
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'start_times', NEW.id,
-            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_start_times_update
-AFTER UPDATE ON start_times
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'start_times', NEW.id,
-            JSON_OBJECT('team_id', OLD.team_id, 'date', OLD.date, 'time', OLD.time, 'is_booked', OLD.is_booked),
-            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_results_insert
-AFTER INSERT ON results
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'results', NEW.id,
-            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-CREATE TRIGGER after_results_update
-AFTER UPDATE ON results
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
-    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'results', NEW.id,
-            JSON_OBJECT('team_id', OLD.team_id, 'start_time_id', OLD.start_time_id, 'time', OLD.time, 'penalty_seconds', OLD.penalty_seconds),
-            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
-            IFNULL(@current_ip, 'localhost'));
-END//
-
-DELIMITER ;
-
 -- Ansichten für häufige Abfragen
 
 -- Alle freien Startzeiten
-CREATE VIEW IF NOT EXISTS `free_start_times` AS
+CREATE OR REPLACE VIEW `free_start_times` AS
 SELECT 
     st.id,
     st.date,
@@ -200,7 +123,7 @@ WHERE st.team_id IS NULL OR st.is_booked = FALSE
 ORDER BY st.date, st.time;
 
 -- Ergebnisse nach Startklasse sortiert
-CREATE VIEW IF NOT EXISTS `results_by_class` AS
+CREATE OR REPLACE VIEW `results_by_class` AS
 SELECT 
     t.name AS team_name,
     t.startklasse,
@@ -215,7 +138,7 @@ LEFT JOIN start_times st ON r.start_time_id = st.id
 ORDER BY t.startklasse, r.final_time;
 
 -- Mannschaftsübersicht mit Startzeiten
-CREATE VIEW IF NOT EXISTS `team_overview` AS
+CREATE OR REPLACE VIEW `team_overview` AS
 SELECT 
     t.id,
     t.name,
@@ -231,8 +154,8 @@ LEFT JOIN results r ON t.id = r.team_id
 GROUP BY t.id, t.name, t.startklasse, t.kapitaen, t.email
 ORDER BY t.startklasse, t.name;
 
--- Startzeiten für einen bestimmten Tag
-CREATE VIEW IF NOT EXISTS `start_times_saturday` AS
+-- Startzeiten für Samstag
+CREATE OR REPLACE VIEW `start_times_saturday` AS
 SELECT 
     st.id,
     st.date,
@@ -246,7 +169,8 @@ LEFT JOIN teams t ON st.team_id = t.id
 WHERE st.date = (SELECT value FROM settings WHERE `key` = 'race_date_saturday')
 ORDER BY st.time;
 
-CREATE VIEW IF NOT EXISTS `start_times_sunday` AS
+-- Startzeiten für Sonntag
+CREATE OR REPLACE VIEW `start_times_sunday` AS
 SELECT 
     st.id,
     st.date,
@@ -263,7 +187,7 @@ ORDER BY st.time;
 -- Prozedur zum Erstellen von Startzeiten für einen Tag
 DELIMITER //
 
-CREATE PROCEDURE create_start_times_for_day(IN p_date DATE, IN p_start_time TIME, IN p_end_time TIME, IN p_interval INT)
+CREATE PROCEDURE IF NOT EXISTS create_start_times_for_day(IN p_date DATE, IN p_start_time TIME, IN p_end_time TIME, IN p_interval INT)
 BEGIN
     DECLARE v_current_time TIME;
     DECLARE v_end_reached BOOLEAN DEFAULT FALSE;
@@ -288,7 +212,9 @@ END//
 DELIMITER ;
 
 -- Prozedur zum Zurücksetzen aller Startzeiten
-CREATE PROCEDURE reset_all_start_times()
+DELIMITER //
+
+CREATE PROCEDURE IF NOT EXISTS reset_all_start_times()
 BEGIN
     -- Alle Startzeiten löschen
     DELETE FROM start_times;
@@ -312,5 +238,90 @@ END//
 
 DELIMITER ;
 
--- Prozedur zum Initialisieren der Startzeiten (wird einmalig aufgerufen)
--- CALL reset_all_start_times();
+-- Trigger für Audit-Log (mit DROP IF EXISTS)
+DELIMITER //
+
+-- Trigger für Teams
+DROP TRIGGER IF EXISTS after_team_insert//;
+CREATE TRIGGER after_team_insert
+AFTER INSERT ON teams
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'teams', NEW.id, 
+            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email), 
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_team_update//;
+CREATE TRIGGER after_team_update
+AFTER UPDATE ON teams
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'teams', NEW.id,
+            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
+            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_team_delete//;
+CREATE TRIGGER after_team_delete
+AFTER DELETE ON teams
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'DELETE', 'teams', OLD.id,
+            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+-- Trigger für Startzeiten
+DROP TRIGGER IF EXISTS after_start_times_insert//;
+CREATE TRIGGER after_start_times_insert
+AFTER INSERT ON start_times
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'start_times', NEW.id,
+            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_start_times_update//;
+CREATE TRIGGER after_start_times_update
+AFTER UPDATE ON start_times
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'start_times', NEW.id,
+            JSON_OBJECT('team_id', OLD.team_id, 'date', OLD.date, 'time', OLD.time, 'is_booked', OLD.is_booked),
+            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+-- Trigger für Ergebnisse
+DROP TRIGGER IF EXISTS after_results_insert//;
+CREATE TRIGGER after_results_insert
+AFTER INSERT ON results
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'results', NEW.id,
+            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_results_update//;
+CREATE TRIGGER after_results_update
+AFTER UPDATE ON results
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'results', NEW.id,
+            JSON_OBJECT('team_id', OLD.team_id, 'start_time_id', OLD.start_time_id, 'time', OLD.time, 'penalty_seconds', OLD.penalty_seconds),
+            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DELIMITER ;
