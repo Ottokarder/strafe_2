@@ -1,12 +1,14 @@
 -- Datenbank-Schema für die Kanadierrennen-Webanwendung
 -- MariaDB SQL-Dump
--- Version: 2.0 (mit IF NOT EXISTS für alle Objekte)
+-- Version: 3.0 (korrigierte DELIMITER-Handhabung)
 
 -- Datenbank erstellen
 CREATE DATABASE IF NOT EXISTS `strafe_2` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `strafe_2`;
 
--- Tabellen erstellen
+-- ============================================
+-- TABELLEN
+-- ============================================
 
 -- 1. Mannschaften
 CREATE TABLE IF NOT EXISTS `teams` (
@@ -25,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `teams` (
 -- 2. Startzeiten
 CREATE TABLE IF NOT EXISTS `start_times` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `team_id` INT NOT NULL,
+    `team_id` INT,
     `date` DATE NOT NULL,
     `time` TIME NOT NULL,
     `is_booked` BOOLEAN DEFAULT FALSE,
@@ -33,8 +35,7 @@ CREATE TABLE IF NOT EXISTS `start_times` (
     PRIMARY KEY (`id`),
     INDEX `idx_team_id` (`team_id`),
     INDEX `idx_date_time` (`date`, `time`),
-    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`) ON DELETE CASCADE,
-    UNIQUE KEY `unique_team_date_time` (`team_id`, `date`, `time`)
+    FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 3. Ergebnisse
@@ -91,11 +92,15 @@ CREATE TABLE IF NOT EXISTS `audit_log` (
     INDEX `idx_created_at` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Standard-Administrator-Benutzer einfügen (Passwort: admin123 - BITTE ÄNDERN!)
+-- ============================================
+-- DATEN EINFÜGEN
+-- ============================================
+
+-- Standard-Administrator-Benutzer (Passwort: admin123 - BITTE ÄNDERN!)
 INSERT IGNORE INTO `users` (`username`, `password_hash`, `is_admin`) 
 VALUES ('admin', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1);
 
--- Standard-Startklassen einfügen
+-- Standard-Einstellungen
 INSERT IGNORE INTO `settings` (`key`, `value`) VALUES 
 ('startklassen', 'Damen|Gemischte Mannschaften|Herren|Betriebsmannschaften|Ortsteile'),
 ('max_starts_per_team', '3'),
@@ -108,7 +113,9 @@ INSERT IGNORE INTO `settings` (`key`, `value`) VALUES
 ('start_interval_minutes', '10'),
 ('reservation_start_date', DATE_SUB('2025-06-21', INTERVAL 6 WEEK));
 
--- Ansichten für häufige Abfragen
+-- ============================================
+-- VIEWS (ANSICHTEN)
+-- ============================================
 
 -- Alle freien Startzeiten
 CREATE OR REPLACE VIEW `free_start_times` AS
@@ -184,9 +191,13 @@ LEFT JOIN teams t ON st.team_id = t.id
 WHERE st.date = (SELECT value FROM settings WHERE `key` = 'race_date_sunday')
 ORDER BY st.time;
 
--- Prozedur zum Erstellen von Startzeiten für einen Tag
+-- ============================================
+-- PROZEDUREN
+-- ============================================
+
 DELIMITER //
 
+-- Prozedur zum Erstellen von Startzeiten für einen Tag
 CREATE PROCEDURE IF NOT EXISTS create_start_times_for_day(IN p_date DATE, IN p_start_time TIME, IN p_end_time TIME, IN p_interval INT)
 BEGIN
     DECLARE v_current_time TIME;
@@ -209,11 +220,7 @@ BEGIN
     END WHILE;
 END//
 
-DELIMITER ;
-
 -- Prozedur zum Zurücksetzen aller Startzeiten
-DELIMITER //
-
 CREATE PROCEDURE IF NOT EXISTS reset_all_start_times()
 BEGIN
     -- Alle Startzeiten löschen
@@ -238,7 +245,10 @@ END//
 
 DELIMITER ;
 
--- Trigger für Audit-Log (mit DROP IF EXISTS)
+-- ============================================
+-- TRIGGER (mit DROP IF EXISTS)
+-- ============================================
+
 DELIMITER //
 
 -- Trigger für Teams
