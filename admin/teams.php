@@ -35,21 +35,21 @@ $startklassen = getStartklassen();
 if ($action === 'delete' && $teamId) {
     // CSRF-Token überprüfen
     if (!isset($_GET['csrf_token']) || !validateCSRFToken($_GET['csrf_token'])) {
-        redirectWithError(''), 'Ungültiges CSRF-Token.');
+        redirectWithError('', 'Ungültiges CSRF-Token.');
     }
     
     // Team abrufen
     $team = getTeamById($teamId);
     if (!$team) {
-        redirectWithError(''), 'Mannschaft nicht gefunden.');
+        redirectWithError('', 'Mannschaft nicht gefunden.');
     }
     
     // Team löschen
     if (deleteTeam($teamId)) {
         logAudit('DELETE', 'teams', $teamId, $team);
-        redirectWithSuccess(''), 'Mannschaft erfolgreich gelöscht.');
+        redirectWithSuccess('', 'Mannschaft erfolgreich gelöscht.');
     } else {
-        redirectWithError(''), 'Fehler beim Löschen der Mannschaft.');
+        redirectWithError('', 'Fehler beim Löschen der Mannschaft.');
     }
 }
 
@@ -59,7 +59,7 @@ if ($action === 'edit' || $action === 'add') {
     if ($action === 'edit' && $teamId) {
         $team = getTeamById($teamId);
         if (!$team) {
-            redirectWithError(''), 'Mannschaft nicht gefunden.');
+            redirectWithError('', 'Mannschaft nicht gefunden.');
         }
     }
     
@@ -94,13 +94,13 @@ if ($action === 'edit' || $action === 'add') {
                     // Neue Mannschaft erstellen
                     $teamId = createTeam($data);
                     logAudit('INSERT', 'teams', $teamId, [], $data);
-                    redirectWithSuccess(''), 'Mannschaft erfolgreich erstellt.');
+                    redirectWithSuccess('', 'Mannschaft erfolgreich erstellt.');
                 } else {
                     // Mannschaft aktualisieren
                     $oldTeam = $team;
                     if (updateTeam($teamId, $data)) {
                         logAudit('UPDATE', 'teams', $teamId, $oldTeam, $data);
-                        redirectWithSuccess(''), 'Mannschaft erfolgreich aktualisiert.');
+                        redirectWithSuccess('', 'Mannschaft erfolgreich aktualisiert.');
                     } else {
                         $error = 'Fehler beim Aktualisieren der Mannschaft.';
                     }
