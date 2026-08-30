@@ -42,7 +42,7 @@ $csrfToken = generateCSRFToken();
     <div class="container">
         <div class="page-header">
             <h1><?php echo $action === 'add' ? 'Neue Mannschaft hinzufügen' : 'Mannschaft bearbeiten'; ?></h1>
-            <a href="../teams.php" class="btn btn-secondary">Zurück zur Übersicht</a>
+            <a href="/admin/teams.php" class="btn btn-secondary">Zurück zur Übersicht</a>
         </div>
         
         <?php if ($error): ?>
@@ -92,7 +92,7 @@ $csrfToken = generateCSRFToken();
                         <button type="submit" class="btn btn-primary">
                             <?php echo $action === 'add' ? 'Mannschaft erstellen' : 'Mannschaft aktualisieren'; ?>
                         </button>
-                        <a href="../teams.php" class="btn btn-secondary">Abbrechen</a>
+                        <a href="/admin/teams.php" class="btn btn-secondary">Abbrechen</a>
                     </div>
                 </form>
             </div>

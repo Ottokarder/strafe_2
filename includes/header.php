@@ -13,7 +13,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Aktuelle Seite bestimmen
-$currentPage = basename($_SERVER['PHP_SELF']);
+$currentPage = $_SERVER['PHP_SELF'];
 
 ?>
 <!DOCTYPE html>

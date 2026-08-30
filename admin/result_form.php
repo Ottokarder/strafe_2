@@ -46,7 +46,7 @@ foreach ($startTimes as $st) {
     <div class="container">
         <div class="page-header">
             <h1><?php echo $action === 'add' ? 'Neues Ergebnis hinzufügen' : 'Ergebnis bearbeiten'; ?></h1>
-            <a href="../results.php" class="btn btn-secondary">Zurück zur Übersicht</a>
+            <a href="/admin/results.php" class="btn btn-secondary">Zurück zur Übersicht</a>
         </div>
         
         <?php if ($error): ?>
@@ -111,7 +111,7 @@ foreach ($startTimes as $st) {
                         <button type="submit" class="btn btn-primary">
                             <?php echo $action === 'add' ? 'Ergebnis speichern' : 'Ergebnis aktualisieren'; ?>
                         </button>
-                        <a href="../results.php" class="btn btn-secondary">Abbrechen</a>
+                        <a href="/admin/results.php" class="btn btn-secondary">Abbrechen</a>
                     </div>
                 </form>
             </div>
