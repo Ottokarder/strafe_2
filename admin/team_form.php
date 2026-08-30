@@ -3,6 +3,9 @@
  * Formular für Mannschaft bearbeiten/hinzufügen
  */
 
+require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
+
 // Standardwerte für neues Team
 if ($action === 'add') {
     $team = [
@@ -13,6 +16,12 @@ if ($action === 'add') {
         'email' => ''
     ];
 }
+
+// Alle Startklassen abrufen
+$startklassen = getStartklassen();
+
+// CSRF-Token generieren
+$csrfToken = generateCSRFToken();
 
 ?>
 <!DOCTYPE html>
