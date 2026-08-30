@@ -55,19 +55,6 @@ header("X-Frame-Options: DENY");
 header("X-Content-Type-Options: nosniff");
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:");
 
-// Datenbank-Verbindung herstellen
-function getDBConnection() {
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-    
-    if ($conn->connect_error) {
-        error_log("Datenbank-Verbindungsfehler: " . $conn->connect_error);
-        die("Datenbank-Verbindung fehlgeschlagen. Bitte versuchen Sie es später erneut.");
-    }
-    
-    $conn->set_charset("utf8mb4");
-    return $conn;
-}
-
 // Überprüfen, ob der Benutzer angemeldet ist
 function isLoggedIn() {
     return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
