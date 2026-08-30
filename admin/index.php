@@ -37,16 +37,7 @@ $success = $_SESSION['success'] ?? null;
 unset($_SESSION['success']);
 
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - <?php echo APP_TITLE; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body class="admin-page">
-    <?php include __DIR__ . '/../includes/header.php'; ?>
+
     
     <div class="container">
         <div class="admin-header">
@@ -185,5 +176,3 @@ unset($_SESSION['success']);
     </div>
     
     <?php include __DIR__ . '/../includes/footer.php'; ?>
-</body>
-</html>

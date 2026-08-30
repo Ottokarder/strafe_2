@@ -28,16 +28,7 @@ $startklassen = getStartklassen();
 $csrfToken = generateCSRFToken();
 
 ?>
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo $action === 'add' ? 'Neue Mannschaft' : 'Mannschaft bearbeiten'; ?> - <?php echo APP_TITLE; ?></title>
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body class="admin-page">
-    <?php include __DIR__ . '/../includes/header.php'; ?>
+
     
     <div class="container">
         <div class="page-header">
@@ -100,5 +91,3 @@ $csrfToken = generateCSRFToken();
     </div>
     
     <?php include __DIR__ . '/../includes/footer.php'; ?>
-</body>
-</html>
