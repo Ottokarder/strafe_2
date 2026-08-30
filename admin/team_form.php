@@ -56,7 +56,7 @@ $csrfToken = generateCSRFToken();
                 <h3><?php echo $action === 'add' ? 'Neue Mannschaft' : 'Mannschaft bearbeiten'; ?></h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="../teams.php?action=<?php echo $action; ?><?php echo $team['id'] ? '&id=' . $team['id'] : ''; ?>">
+                <form method="POST" action="/admin/teams.php?action=<?php echo $action; ?><?php echo $team['id'] ? '&id=' . $team['id'] : ''; ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                     
                     <div class="form-group">
