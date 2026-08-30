@@ -91,23 +91,31 @@ function redirectToLogin($message = 'Bitte melden Sie sich an.') {
 
 /**
  * Weiterleitung mit Fehlermeldung
- * @param string $location Ziel-URL
+ * @param string $location Ziel-URL (leer = aktuelle Seite neu laden)
  * @param string $message Fehlermeldung
  */
 function redirectWithError($location, $message) {
     $_SESSION['error'] = $message;
-    header("Location: " . $location);
+    if (empty($location)) {
+        header("Location: " . $_SERVER['REQUEST_URI']);
+    } else {
+        header("Location: " . $location);
+    }
     exit();
 }
 
 /**
  * Weiterleitung mit Erfolgsmeldung
- * @param string $location Ziel-URL
+ * @param string $location Ziel-URL (leer = aktuelle Seite neu laden)
  * @param string $message Erfolgsmeldung
  */
 function redirectWithSuccess($location, $message) {
     $_SESSION['success'] = $message;
-    header("Location: " . $location);
+    if (empty($location)) {
+        header("Location: " . $_SERVER['REQUEST_URI']);
+    } else {
+        header("Location: " . $location);
+    }
     exit();
 }
 
