@@ -46,7 +46,7 @@ foreach ($startTimes as $st) {
     <div class="container">
         <div class="page-header">
             <h1><?php echo $action === 'add' ? 'Neues Ergebnis hinzufügen' : 'Ergebnis bearbeiten'; ?></h1>
-            <a href="results.php" class="btn btn-secondary">Zurück zur Übersicht</a>
+            <a href="../results.php" class="btn btn-secondary">Zurück zur Übersicht</a>
         </div>
         
         <?php if ($error): ?>
@@ -60,7 +60,7 @@ foreach ($startTimes as $st) {
                 <h3><?php echo $action === 'add' ? 'Neues Ergebnis' : 'Ergebnis bearbeiten'; ?></h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="results.php?action=<?php echo $action; ?><?php echo $result['id'] ? '&id=' . $result['id'] : ''; ?>">
+                <form method="POST" action="../results.php?action=<?php echo $action; ?><?php echo $result['id'] ? '&id=' . $result['id'] : ''; ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                     
                     <div class="form-group">
@@ -111,7 +111,7 @@ foreach ($startTimes as $st) {
                         <button type="submit" class="btn btn-primary">
                             <?php echo $action === 'add' ? 'Ergebnis speichern' : 'Ergebnis aktualisieren'; ?>
                         </button>
-                        <a href="results.php" class="btn btn-secondary">Abbrechen</a>
+                        <a href="../results.php" class="btn btn-secondary">Abbrechen</a>
                     </div>
                 </form>
             </div>

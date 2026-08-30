@@ -29,7 +29,7 @@ if ($action === 'add') {
     <div class="container">
         <div class="page-header">
             <h1><?php echo $action === 'add' ? 'Neue Mannschaft hinzufügen' : 'Mannschaft bearbeiten'; ?></h1>
-            <a href="teams.php" class="btn btn-secondary">Zurück zur Übersicht</a>
+            <a href="../teams.php" class="btn btn-secondary">Zurück zur Übersicht</a>
         </div>
         
         <?php if ($error): ?>
@@ -43,7 +43,7 @@ if ($action === 'add') {
                 <h3><?php echo $action === 'add' ? 'Neue Mannschaft' : 'Mannschaft bearbeiten'; ?></h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="teams.php?action=<?php echo $action; ?><?php echo $team['id'] ? '&id=' . $team['id'] : ''; ?>">
+                <form method="POST" action="../teams.php?action=<?php echo $action; ?><?php echo $team['id'] ? '&id=' . $team['id'] : ''; ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                     
                     <div class="form-group">
@@ -79,7 +79,7 @@ if ($action === 'add') {
                         <button type="submit" class="btn btn-primary">
                             <?php echo $action === 'add' ? 'Mannschaft erstellen' : 'Mannschaft aktualisieren'; ?>
                         </button>
-                        <a href="teams.php" class="btn btn-secondary">Abbrechen</a>
+                        <a href="../teams.php" class="btn btn-secondary">Abbrechen</a>
                     </div>
                 </form>
             </div>
