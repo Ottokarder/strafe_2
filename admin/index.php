@@ -74,7 +74,7 @@ unset($_SESSION['success']);
                 <div class="card-body">
                     <p class="stat-number"><?php echo $teamCount['count']; ?></p>
                     <p>registrierte Mannschaften</p>
-                    <a href="teams.php" class="btn btn-primary">Verwalten</a>
+                    <a href="/admin/teams.php" class="btn btn-primary">Verwalten</a>
                 </div>
             </div>
             
@@ -86,7 +86,7 @@ unset($_SESSION['success']);
                     <p class="stat-number"><?php echo $startTimeCount['count']; ?></p>
                     <p>gebuchte Startzeiten</p>
                     <p class="stat-small"><?php echo $freeStartTimes['count']; ?> frei</p>
-                    <a href="start_times.php" class="btn btn-primary">Verwalten</a>
+                    <a href="/admin/start_times.php" class="btn btn-primary">Verwalten</a>
                 </div>
             </div>
             
@@ -97,7 +97,7 @@ unset($_SESSION['success']);
                 <div class="card-body">
                     <p class="stat-number"><?php echo $resultCount['count']; ?></p>
                     <p>erfasste Ergebnisse</p>
-                    <a href="results.php" class="btn btn-primary">Verwalten</a>
+                    <a href="/admin/results.php" class="btn btn-primary">Verwalten</a>
                 </div>
             </div>
             
@@ -108,7 +108,7 @@ unset($_SESSION['success']);
                 <div class="card-body">
                     <a href="/admin/teams.php?action=add" class="btn btn-success">Neue Mannschaft</a>
                     <a href="start_times.php?action=reset" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
-                    <a href="export.php" class="btn btn-info">Daten exportieren</a>
+                    <a href="/admin/export.php" class="btn btn-info">Daten exportieren</a>
                 </div>
             </div>
         </div>
