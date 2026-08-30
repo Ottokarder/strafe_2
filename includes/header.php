@@ -66,7 +66,7 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="<?php echo strpos($currentPage, 'admin') !== false ? 'logout.php' : 'admin/logout.php'; ?>" 
+                            <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../logout.php' : 'logout.php'; ?>" 
                                class="nav-link">
                                 Abmelden
                             </a>
