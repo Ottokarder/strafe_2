@@ -28,6 +28,7 @@ $startklassen = getStartklassen();
 $csrfToken = generateCSRFToken();
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">

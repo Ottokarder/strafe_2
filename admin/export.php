@@ -55,6 +55,7 @@ if ($action === 'export_results' || $action === 'export_start_times' || $action 
 }
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">

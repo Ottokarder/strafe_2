@@ -32,6 +32,7 @@ foreach ($startTimes as $st) {
 }
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">

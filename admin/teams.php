@@ -124,6 +124,7 @@ foreach ($teams as &$team) {
 }
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     <div class="container">
         <div class="page-header">

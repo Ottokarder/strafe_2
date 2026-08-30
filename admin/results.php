@@ -132,6 +132,7 @@ $startklassen = getStartklassen();
 $selectedClass = $_GET['class'] ?? '';
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">

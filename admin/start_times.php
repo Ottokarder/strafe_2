@@ -115,6 +115,7 @@ $freeStartTimes = getFreeStartTimes();
 $selectedTeamId = $teamId;
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">

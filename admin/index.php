@@ -37,6 +37,7 @@ $success = $_SESSION['success'] ?? null;
 unset($_SESSION['success']);
 
 ?>
+<?php include __DIR__ . '/../includes/header.php'; ?>
 
     
     <div class="container">
