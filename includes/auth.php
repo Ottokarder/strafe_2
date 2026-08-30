@@ -85,7 +85,7 @@ function checkAccess($requireAdmin = false) {
  */
 function redirectToLogin($message = 'Bitte melden Sie sich an.') {
     $_SESSION['login_error'] = $message;
-    header("Location: login.php");
+    header("Location: /login.php");
     exit();
 }
 
