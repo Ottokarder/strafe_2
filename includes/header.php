@@ -46,14 +46,14 @@ $currentPage = basename($_SERVER['PHP_SELF']);
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../startzeiten.php' : 'startzeiten.php'; ?>" 
-                           class="nav-link <?php echo $currentPage === 'startzeiten.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../start_times.php' : 'startzeiten.php'; ?>" 
+                           class="nav-link <?php echo $currentPage === 'startzeiten.php' || $currentPage === 'start_times.php' ? 'active' : ''; ?>">
                             Startzeiten
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../ergebnisse.php' : 'ergebnisse.php'; ?>" 
-                           class="nav-link <?php echo $currentPage === 'ergebnisse.php' ? 'active' : ''; ?>">
+                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../results.php' : 'ergebnisse.php'; ?>" 
+                           class="nav-link <?php echo $currentPage === 'ergebnisse.php' || $currentPage === 'results.php' ? 'active' : ''; ?>">
                             Ergebnisse
                         </a>
                     </li>
