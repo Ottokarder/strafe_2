@@ -138,7 +138,7 @@ foreach ($teams as &$team) {
     <div class="container">
         <div class="page-header">
             <h1>Mannschaftsverwaltung</h1>
-            <a href="teams.php?action=add" class="btn btn-primary">Neue Mannschaft hinzufügen</a>
+            <a href="?action=add" class="btn btn-primary">Neue Mannschaft hinzufügen</a>
         </div>
         
         <?php if ($error): ?>
