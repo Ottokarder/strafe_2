@@ -159,7 +159,7 @@ foreach ($teams as &$team) {
             </div>
             <div class="card-body">
                 <?php if (empty($teams)): ?>
-                    <p>Keine Mannschaften gefunden. <a href="teams.php?action=add">Erste Mannschaft hinzufügen</a></p>
+                    <p>Keine Mannschaften gefunden. <a href="?action=add">Erste Mannschaft hinzufügen</a></p>
                 <?php else: ?>
                     <table class="table">
                         <thead>
@@ -179,9 +179,9 @@ foreach ($teams as &$team) {
                                     <td><?php echo htmlspecialchars($team['kapitaen']); ?></td>
                                     <td><?php echo $team['start_count']; ?> / <?php echo MAX_STARTS_PER_TEAM; ?></td>
                                     <td>
-                                        <a href="teams.php?action=edit&id=<?php echo $team['id']; ?>" class="btn btn-small btn-secondary">Bearbeiten</a>
+                                        <a href="?action=edit&id=<?php echo $team['id']; ?>" class="btn btn-small btn-secondary">Bearbeiten</a>
                                         <a href="../start_times.php?team_id=<?php echo $team['id']; ?>" class="btn btn-small btn-info">Startzeiten</a>
-                                        <a href="teams.php?action=delete&id=<?php echo $team['id']; ?>&csrf_token=<?php echo $csrfToken; ?>" 
+                                        <a href="?action=delete&id=<?php echo $team['id']; ?>&csrf_token=<?php echo $csrfToken; ?>" 
                                            class="btn btn-small btn-danger" 
                                            onclick="return confirm('Möchten Sie diese Mannschaft wirklich löschen? Alle zugehörigen Startzeiten und Ergebnisse werden ebenfalls gelöscht.')">Löschen</a>
                                     </td>

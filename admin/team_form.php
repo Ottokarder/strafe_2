@@ -6,6 +6,10 @@
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
+// Aktuelle Aktion abrufen
+$action = $_GET['action'] ?? '';
+$teamId = $_GET['id'] ?? null;
+
 // Standardwerte für neues Team
 if ($action === 'add') {
     $team = [
