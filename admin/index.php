@@ -106,7 +106,7 @@ unset($_SESSION['success']);
                     <h3>Schnellaktionen</h3>
                 </div>
                 <div class="card-body">
-                    <a href="teams.php?action=add" class="btn btn-success">Neue Mannschaft</a>
+                    <a href="?action=add" class="btn btn-success">Neue Mannschaft</a>
                     <a href="start_times.php?action=reset" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
                     <a href="export.php" class="btn btn-info">Daten exportieren</a>
                 </div>
