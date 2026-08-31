@@ -10,7 +10,7 @@ if ($action === 'add') {
         'team_id' => '',
         'start_time_id' => null,
         'time' => '',
-        'penalty_seconds' => 0
+        
     ];
 }
 
@@ -52,7 +52,7 @@ foreach ($startTimes as $st) {
                 <h3><?php echo $action === 'add' ? 'Neues Ergebnis' : 'Ergebnis bearbeiten'; ?></h3>
             </div>
             <div class="card-body">
-                <form method="POST" action="../results.php?action=<?php echo $action; ?><?php echo $result['id'] ? '&id=' . $result['id'] : ''; ?>">
+                <form method="POST" action="/admin/results.php?action=<?php echo $action; ?><?php echo $result['id'] ? '&id=' . $result['id'] : ''; ?>">
                     <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                     
                     <div class="form-group">
