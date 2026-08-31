@@ -158,7 +158,12 @@ $selectedTeamId = $teamId;
                         <label for="team_filter">Mannschaft auswählen:</label>
                         <select id="team_filter" name="team_id" onchange="this.form.submit()">
                             <option value="">-- Alle Mannschaften anzeigen --</option>
-                            <?php foreach ($teams as $t): ?>
+                            <?php 
+// Sortiere Teams nach Eingabezeitpunkt (neueste zuerst)
+usort($teams, function($a, $b) {
+    return strtotime($b['created_at']) <=> strtotime($a['created_at']);
+});
+foreach ($teams as $t): ?>
                                 <option value="<?php echo $t['id']; ?>" 
                                     <?php echo $selectedTeamId == $t['id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($t['name'] . ' (' . $t['startklasse'] . ')'); ?>
