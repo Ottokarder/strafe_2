@@ -169,7 +169,6 @@ foreach ($teams as $key => $team) {
                                     <td><?php echo $team['start_count']; ?> / <?php echo MAX_STARTS_PER_TEAM; ?></td>
                                     <td>
                                         <a href="?action=edit&id=<?php echo $team['id']; ?>" class="btn btn-small btn-secondary">Bearbeiten</a>
-                                        <a href="../start_times.php?team_id=<?php echo $team['id']; ?>" class="btn btn-small btn-info">Startzeiten</a>
                                         <a href="?action=delete&id=<?php echo $team['id']; ?>&csrf_token=<?php echo $csrfToken; ?>" 
                                            class="btn btn-small btn-danger" 
                                            onclick="return confirm('Möchten Sie diese Mannschaft wirklich löschen? Alle zugehörigen Startzeiten und Ergebnisse werden ebenfalls gelöscht.')">Löschen</a>
