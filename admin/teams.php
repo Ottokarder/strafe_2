@@ -116,9 +116,9 @@ if ($action === 'edit' || $action === 'add') {
 $teams = getAllTeams();
 
 // Startzeiten für jede Mannschaft abrufen
-foreach ($teams as &$team) {
-    $team['start_times'] = getStartTimesForTeam($team['id']);
-    $team['start_count'] = count($team['start_times']);
+foreach ($teams as $key => $team) {
+    $teams[$key]['start_times'] = getStartTimesForTeam($team['id']);
+    $teams[$key]['start_count'] = count($teams[$key]['start_times']);
 }
 
 ?>
