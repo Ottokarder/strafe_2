@@ -40,7 +40,10 @@ if ($action === 'reset') {
 }
 
 // Startzeit zuweisen
-if ($action === 'assign' && $startTimeId && $teamId) {
+if ($action === 'assign' && $startTimeId) {
+    if (empty($teamId)) {
+        redirectWithError('start_times.php', 'Bitte wählen Sie eine Mannschaft aus, der die Startzeit zugewiesen werden soll.');
+    }
     if (!isset($_GET['csrf_token']) || !validateCSRFToken($_GET['csrf_token'])) {
         redirectWithError('start_times.php', 'Ungültiges CSRF-Token.');
     }
