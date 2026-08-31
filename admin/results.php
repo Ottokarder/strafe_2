@@ -68,8 +68,7 @@ if ($action === 'edit' || $action === 'add') {
             $data = [
                 'team_id' => (int)($_POST['team_id'] ?? 0),
                 'start_time_id' => !empty($_POST['start_time_id']) ? (int)$_POST['start_time_id'] : null,
-                'time' => validateInput($_POST['time'] ?? ''),
-                'penalty_seconds' => (int)($_POST['penalty_seconds'] ?? 0)
+                'time' => validateInput($_POST['time'] ?? '')
             ];
             
             // Validierung

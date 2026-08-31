@@ -92,12 +92,7 @@ foreach ($startTimes as $st) {
                         <small>Format: Minuten:Sekunden (z. B. 45:23)</small>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="penalty_seconds">Strafsekunden</label>
-                        <input type="number" id="penalty_seconds" name="penalty_seconds" 
-                               value="<?php echo $result['penalty_seconds']; ?>" min="0">
-                        <small>Strafsekunden, die zur Rennzeit addiert werden.</small>
-                    </div>
+
                     
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">

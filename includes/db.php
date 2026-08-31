@@ -297,12 +297,11 @@ function getAllResults() {
  * @return int Ergebnis-ID
  */
 function createResult($data) {
-    $sql = "INSERT INTO results (team_id, start_time_id, time, penalty_seconds) VALUES (?, ?, ?, ?)";
-    execute($sql, "iisi", [
+    $sql = "INSERT INTO results (team_id, start_time_id, time) VALUES (?, ?, ?)";
+    execute($sql, "iis", [
         $data['team_id'],
         $data['start_time_id'] ?? null,
-        $data['time'],
-        $data['penalty_seconds'] ?? 0
+        $data['time']
     ]);
     return getLastInsertId();
 }
@@ -314,12 +313,11 @@ function createResult($data) {
  * @return bool
  */
 function updateResult($id, $data) {
-    $sql = "UPDATE results SET team_id = ?, start_time_id = ?, time = ?, penalty_seconds = ? WHERE id = ?";
+    $sql = "UPDATE results SET team_id = ?, start_time_id = ?, time = ? WHERE id = ?";
     return execute($sql, "iisi", [
         $data['team_id'],
         $data['start_time_id'] ?? null,
         $data['time'],
-        $data['penalty_seconds'] ?? 0,
         $id
     ]) > 0;
 }
