@@ -247,7 +247,7 @@ $selectedTeamId = $teamId;
                                                 <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=<?php echo $selectedTeamId; ?>&csrf_token=<?php echo $csrfToken; ?>" 
                                                    class="btn btn-small btn-success">Zuweisen</a>
                                             <?php else: ?>
-                                                <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=&csrf_token=<?php echo $csrfToken; ?>" 
+                                                <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&csrf_token=<?php echo $csrfToken; ?>" 
                                                    class="btn btn-small btn-success" onclick="alert('Bitte wählen Sie zuerst eine Mannschaft aus.'); return false;">Zuweisen</a>
                                             <?php endif; ?>
                                         </td>
