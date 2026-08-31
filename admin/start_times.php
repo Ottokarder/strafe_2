@@ -148,7 +148,29 @@ $selectedTeamId = $teamId;
             </div>
         <?php endif; ?>
         
-        <?php if ($selectedTeamId && $team = getTeamById($selectedTeamId)): ?>
+                <div class="card">
+            <div class="card-header">
+                <h3>Mannschaft auswählen</h3>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="start_times.php">
+                    <div class="form-group">
+                        <label for="team_filter">Mannschaft auswählen:</label>
+                        <select id="team_filter" name="team_id" onchange="this.form.submit()">
+                            <option value="">-- Alle Mannschaften anzeigen --</option>
+                            <?php foreach ($teams as $t): ?>
+                                <option value="<?php echo $t['id']; ?>" 
+                                    <?php echo $selectedTeamId == $t['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($t['name'] . ' (' . $t['startklasse'] . ')'); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+<?php if ($selectedTeamId && $team = getTeamById($selectedTeamId)): ?>
             <div class="card">
                 <div class="card-header">
                     <h3>Startzeiten für: <?php echo htmlspecialchars($team['name']); ?> (<?php echo htmlspecialchars($team['startklasse']); ?>)</h3>
