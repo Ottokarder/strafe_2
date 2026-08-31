@@ -203,7 +203,7 @@ $selectedTeamId = $teamId;
                                                        class="btn btn-small btn-warning" 
                                                        onclick="return confirm('Startzeit freigeben?')">Freigeben</a>
                                                 <?php else: ?>
-                                                    <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=<?php echo $selectedTeamId ?: ''; ?>&csrf_token=<?php echo $csrfToken; ?>" 
+                                                    <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=<?php echo $selectedTeamId; ?>&csrf_token=<?php echo $csrfToken; ?>" 
                                                        class="btn btn-small btn-success">Zuweisen</a>
                                                 <?php endif; ?>
                                             </td>
@@ -240,8 +240,13 @@ $selectedTeamId = $teamId;
                                         <td><?php echo htmlspecialchars($st['date']); ?></td>
                                         <td><?php echo htmlspecialchars($st['time']); ?></td>
                                         <td>
-                                            <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&csrf_token=<?php echo $csrfToken; ?>" 
-                                               class="btn btn-small btn-success">Zuweisen</a>
+                                            <?php if ($selectedTeamId): ?>
+                                                <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=<?php echo $selectedTeamId; ?>&csrf_token=<?php echo $csrfToken; ?>" 
+                                                   class="btn btn-small btn-success">Zuweisen</a>
+                                            <?php else: ?>
+                                                <a href="start_times.php?action=assign&id=<?php echo $st['id']; ?>&team_id=&csrf_token=<?php echo $csrfToken; ?>" 
+                                                   class="btn btn-small btn-success" onclick="alert('Bitte wählen Sie zuerst eine Mannschaft aus.'); return false;">Zuweisen</a>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

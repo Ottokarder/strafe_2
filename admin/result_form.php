@@ -85,11 +85,11 @@ foreach ($startTimes as $st) {
                     </div>
                     
                     <div class="form-group">
-                        <label for="time">Rennzeit * (HH:MM:SS)</label>
+                        <label for="time">Rennzeit * (MM:SS)</label>
                         <input type="text" id="time" name="time" 
                                value="<?php echo htmlspecialchars($result['time']); ?>" 
-                               placeholder="HH:MM:SS" required>
-                        <small>Format: Stunden:Minuten:Sekunden (z. B. 00:45:23)</small>
+                               placeholder="MM:SS" required>
+                        <small>Format: Minuten:Sekunden (z. B. 45:23)</small>
                     </div>
                     
                     <div class="form-group">

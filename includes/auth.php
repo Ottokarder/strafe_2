@@ -161,12 +161,13 @@ function validateEmail($email) {
 }
 
 /**
- * Zeit validieren (HH:MM:SS)
+ * Zeit validieren (MM:SS oder HH:MM:SS)
  * @param string $time Zeit
  * @return bool
  */
 function validateTime($time) {
-    return preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/', $time);
+    // Erlaubt MM:SS oder HH:MM:SS
+    return preg_match('/^([0-5]?[0-9]):[0-5][0-9]$/', $time) || preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$/', $time);
 }
 
 /**
@@ -181,16 +182,24 @@ function validateDate($date) {
 
 /**
  * Zeit in Sekunden umrechnen
- * @param string $time Zeit (HH:MM:SS)
+ * @param string $time Zeit (MM:SS oder HH:MM:SS)
  * @return int Sekunden
  */
 function timeToSeconds($time) {
-    list($h, $m, $s) = explode(':', $time);
-    return ($h * 3600) + ($m * 60) + $s;
+    $parts = explode(':', $time);
+    if (count($parts) === 2) {
+        // MM:SS Format
+        list($m, $s) = $parts;
+        return ($m * 60) + $s;
+    } else {
+        // HH:MM:SS Format
+        list($h, $m, $s) = $parts;
+        return ($h * 3600) + ($m * 60) + $s;
+    }
 }
 
 /**
- * Sekunden in Zeit umrechnen (HH:MM:SS)
+ * Sekunden in Zeit umrechnen (MM:SS oder HH:MM:SS)
  * @param int $seconds Sekunden
  * @return string Zeit
  */
@@ -198,7 +207,12 @@ function secondsToTime($seconds) {
     $h = floor($seconds / 3600);
     $m = floor(($seconds % 3600) / 60);
     $s = $seconds % 60;
-    return sprintf('%02d:%02d:%02d', $h, $m, $s);
+    
+    if ($h > 0) {
+        return sprintf('%02d:%02d:%02d', $h, $m, $s);
+    } else {
+        return sprintf('%02d:%02d', $m, $s);
+    }
 }
 
 /**

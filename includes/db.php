@@ -162,7 +162,7 @@ function tableExists($tableName) {
  * @return array
  */
 function getAllTeams() {
-    return fetchAll("SELECT * FROM teams ORDER BY startklasse, name");
+    return fetchAll("SELECT * FROM teams ORDER BY COALESCE(startklasse, ''), name");
 }
 
 /**
@@ -186,7 +186,7 @@ function createTeam($data) {
         $sql = "INSERT INTO teams (name, startklasse, kapitaen, email) VALUES (?, ?, ?, ?)";
         execute($sql, "ssss", [
             $data['name'],
-            $data['startklasse'],
+            $data['startklasse'] ?? null,
             $data['kapitaen'],
             $data['email']
         ]);
@@ -210,7 +210,7 @@ function updateTeam($id, $data) {
     $sql = "UPDATE teams SET name = ?, startklasse = ?, kapitaen = ?, email = ? WHERE id = ?";
     return execute($sql, "ssssi", [
         $data['name'],
-        $data['startklasse'],
+        $data['startklasse'] ?? null,
         $data['kapitaen'],
         $data['email'],
         $id

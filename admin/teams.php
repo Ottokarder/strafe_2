@@ -81,8 +81,6 @@ if ($action === 'edit' || $action === 'add') {
             // Validierung
             if (empty($data['name'])) {
                 $error = 'Bitte geben Sie einen Mannschaftsnamen ein.';
-            } elseif (empty($data['startklasse'])) {
-                $error = 'Bitte wählen Sie eine Startklasse aus.';
             } elseif (empty($data['kapitaen'])) {
                 $error = 'Bitte geben Sie einen Kapitänsnamen ein.';
             } elseif (!validateEmail($data['email'])) {

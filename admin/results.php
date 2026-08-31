@@ -78,7 +78,7 @@ if ($action === 'edit' || $action === 'add') {
             } elseif (empty($data['time'])) {
                 $error = 'Bitte geben Sie eine Zeit ein.';
             } elseif (!validateTime($data['time'])) {
-                $error = 'Bitte geben Sie eine gültige Zeit ein (HH:MM:SS).';
+                $error = 'Bitte geben Sie eine gültige Zeit ein (MM:SS).';
             }
             
             if (!$error) {

@@ -57,9 +57,9 @@ $csrfToken = generateCSRFToken();
                     </div>
                     
                     <div class="form-group">
-                        <label for="startklasse">Startklasse *</label>
-                        <select id="startklasse" name="startklasse" required>
-                            <option value="">-- Bitte wählen --</option>
+                        <label for="startklasse">Startklasse (optional)</label>
+                        <select id="startklasse" name="startklasse">
+                            <option value="">-- Keine Startklasse --</option>
                             <?php foreach ($startklassen as $klasse): ?>
                                 <option value="<?php echo htmlspecialchars($klasse); ?>" 
                                     <?php echo $team['startklasse'] === $klasse ? 'selected' : ''; ?>>
