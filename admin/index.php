@@ -72,6 +72,18 @@ unset($_SESSION['success']);
 
             <div class="card">
                 <div class="card-header">
+                    <h3>Startzeiten</h3>
+                </div>
+                <div class="card-body">
+                    <p class="stat-number"><?php echo $startTimeCount['count']; ?></p>
+                    <p>gebuchte Startzeiten</p>
+                    <p class="stat-small"><?php echo $freeStartTimes['count']; ?> frei</p>
+                    <a href="/admin/start_times.php" class="btn btn-primary">Verwalten</a>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
                     <h3>Mannschaften ohne Zuordnung</h3>
                 </div>
                 <div class="card-body">
