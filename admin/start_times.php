@@ -138,19 +138,20 @@ if ($action === 'save_result' && $startTimeId) {
             redirectWithError('start_times.php', $errorMsg);
         }
     } else {
-        // Neues Ergebnis erstellen
-        $inserted = execute("INSERT INTO results (team_id, start_time_id, time) VALUES (?, ?, ?)", "iis", 
-            [$startTime['team_id'], $startTimeId, $dbTime]);
+        // Neues Ergebnis erstellen - direkte Abfrage ohne Prepared Statement
+        $conn = getDBConnection();
+        $sql = "INSERT INTO results (team_id, start_time_id, time) VALUES (" . (int)$startTime['team_id'] . ", " . (int)$startTimeId . ", '" . $conn->real_escape_string($dbTime) . "')";
+        $result = $conn->query($sql);
         
-        if ($inserted > 0) {
-            $resultId = getLastInsertId();
+        if ($result === true) {
+            $resultId = $conn->insert_id;
             logAudit('INSERT', 'results', $resultId, [], ['team_id' => $startTime['team_id'], 'start_time_id' => $startTimeId, 'time' => $dbTime]);
             redirectWithSuccess('start_times.php', 'Rennergebnis erfolgreich gespeichert.');
         } else {
             // Debug-Info
-            $errorMsg = 'Fehler beim Speichern des Ergebnisses. SQL: INSERT INTO results (team_id, start_time_id, time) VALUES (' . $startTime['team_id'] . ', ' . $startTimeId . ', \'' . $dbTime . '\')';
+            $errorMsg = 'Fehler beim Speichern des Ergebnisses. SQL: ' . $sql . ' | MySQL-Fehler: ' . $conn->error;
             error_log($errorMsg);
-            redirectWithError('start_times.php', $errorMsg);
+            redirectWithError('start_times.php', 'Datenbankfehler: ' . $conn->error);
         }
     }
 }
