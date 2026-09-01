@@ -76,18 +76,36 @@ unset($_SESSION['success']);
                 </div>
                 <div class="card-body">
                     <?php 
-                    $teamsWithoutStart = fetchAll("SELECT t.name, t.id, t.startklasse FROM teams t LEFT JOIN start_times st ON t.id = st.team_id WHERE st.team_id IS NULL OR t.startklasse IS NULL OR t.startklasse = ''");
-                    if (empty($teamsWithoutStart)):
+                    $teamsWithoutStart = fetchAll("SELECT t.name, t.id, t.startklasse FROM teams t LEFT JOIN start_times st ON t.id = st.team_id WHERE st.team_id IS NULL");
+                    $teamsWithoutClass = fetchAll("SELECT t.name, t.id FROM teams t WHERE t.startklasse IS NULL OR t.startklasse = ''");
+                    
+                    $countWithoutStart = count($teamsWithoutStart);
+                    $countWithoutClass = count($teamsWithoutClass);
+                    
+                    if ($countWithoutStart === 0 && $countWithoutClass === 0):
                     ?>
                         <p class="stat-number">0</p>
-                        <p>Alle Mannschaften haben Startzeiten</p>
+                        <p>Alle Mannschaften haben Startzeiten und Startklassen</p>
                     <?php else: ?>
-                        <p class="stat-number"><?php echo count($teamsWithoutStart); ?></p>
-                        <p>Mannschaften ohne Startzeit oder Startklasse:</p>
-                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                        <p><strong>Ohne Startzeit:</strong> <?php echo $countWithoutStart; ?></p>
+                        <p><strong>Ohne Startklasse:</strong> <?php echo $countWithoutClass; ?></p>
+                        <p style="margin-top: 1rem;">Mannschaften ohne Zuordnung:</p>
+                        <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
                             <?php foreach ($teamsWithoutStart as $team): ?>
-                                <li><?php echo htmlspecialchars($team['name']); ?> <?php echo $team['startklasse'] ? '(Startklasse: ' . htmlspecialchars($team['startklasse']) . ')' : '(ohne Startklasse)'; ?></li>
+                                <li><?php echo htmlspecialchars($team['name']); ?> (ohne Startzeit)<?php echo $team['startklasse'] ? ' (Startklasse: ' . htmlspecialchars($team['startklasse']) . ')' : ' (ohne Startklasse)'; ?></li>
                             <?php endforeach; ?>
+                            <?php foreach ($teamsWithoutClass as $team):
+                                $isAlreadyListed = false;
+                                foreach ($teamsWithoutStart as $t) {
+                                    if ($t['id'] == $team['id']) {
+                                        $isAlreadyListed = true;
+                                        break;
+                                    }
+                                }
+                                if (!$isAlreadyListed):
+                            ?>
+                                <li><?php echo htmlspecialchars($team['name']); ?> (ohne Startklasse)</li>
+                            <?php endif; endforeach; ?>
                         </ul>
                     <?php endif; ?>
                 </div>
