@@ -44,7 +44,7 @@ $currentPage = $_SERVER['PHP_SELF'];
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a href="startzeiten.php" 
+                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? '../startzeiten.php' : 'startzeiten.php'; ?>" 
                            class="nav-link <?php echo $currentPage === 'startzeiten.php' ? 'active' : ''; ?>">
                             Startzeiten
                         </a>
