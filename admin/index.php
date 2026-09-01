@@ -20,7 +20,6 @@ $user = getCurrentUser();
 // Statistiken abrufen
 $teamCount = fetchOne("SELECT COUNT(*) as count FROM teams");
 $startTimeCount = fetchOne("SELECT COUNT(*) as count FROM start_times WHERE is_booked = TRUE");
-$resultCount = fetchOne("SELECT COUNT(*) as count FROM results");
 $freeStartTimes = fetchOne("SELECT COUNT(*) as count FROM start_times WHERE is_booked = FALSE");
 
 // Letzte Änderungen
@@ -84,12 +83,38 @@ unset($_SESSION['success']);
             
             <div class="card">
                 <div class="card-header">
-                    <h3>Ergebnisse</h3>
+                    <h3>Mannschaften ohne Startzeit</h3>
                 </div>
                 <div class="card-body">
-                    <p class="stat-number"><?php echo $resultCount['count']; ?></p>
-                    <p>erfasste Ergebnisse</p>
-                    <a href="/admin/results.php" class="btn btn-primary">Verwalten</a>
+                    <?php 
+                    $teamsWithoutStart = fetchAll("SELECT t.name, t.id FROM teams t LEFT JOIN start_times st ON t.id = st.team_id WHERE st.team_id IS NULL");
+                    if (empty($teamsWithoutStart)):
+                    ?>
+                        <p class="stat-number">0</p>
+                        <p>Alle Mannschaften haben Startzeiten</p>
+                    <?php else: ?>
+                        <p class="stat-number"><?php echo count($teamsWithoutStart); ?></p>
+                        <p>Mannschaften ohne Startzeit:</p>
+                        <ul style="margin-top: 1rem; padding-left: 1.5rem;">
+                            <?php foreach ($teamsWithoutStart as $team): ?>
+                                <li><?php echo htmlspecialchars($team['name']); ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h3>Ergebnis-Statistik</h3>
+                </div>
+                <div class="card-body">
+                    <?php 
+                    $teamsWithResults = fetchOne("SELECT COUNT(DISTINCT team_id) as count FROM results");
+                    $teamsWithoutResults = fetchOne("SELECT COUNT(*) as count FROM teams t LEFT JOIN results r ON t.id = r.team_id WHERE r.team_id IS NULL");
+                    ?>
+                    <p><strong>Mit Ergebnissen:</strong> <?php echo $teamsWithResults['count']; ?></p>
+                    <p><strong>Ohne Ergebnisse:</strong> <?php echo $teamsWithoutResults['count']; ?></p>
                 </div>
             </div>
             

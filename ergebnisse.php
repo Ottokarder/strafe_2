@@ -1,15 +1,15 @@
 <?php
 /**
- * Öffentliche Ergebnisse-Seite
+ * ffentliche Ergebnisse-Seite
  */
 
 require_once __DIR__ . '/includes/db.php';
 require_once __DIR__ . '/includes/auth.php';
 
-// Prüfen, ob das Rennen begonnen hat
+// Prfen, ob das Rennen begonnen hat
 $raceStarted = isRaceStarted();
 
-// Prüfen, ob das Rennen vorbei ist
+// Prfen, ob das Rennen vorbei ist
 $raceFinished = isRaceFinished();
 
 // Ergebnisse abrufen
@@ -61,7 +61,7 @@ unset($_SESSION['success']);
                 } elseif ($raceStarted) {
                     echo "Aktuelle Ergebnisse werden in Echtzeit aktualisiert.";
                 } else {
-                    echo "Ergebnisse werden während des Rennens hier angezeigt.";
+                    echo "Ergebnisse werden whrend des Rennens hier angezeigt.";
                 }
                 ?>
             </p>
@@ -85,9 +85,9 @@ unset($_SESSION['success']);
                     <p>
                         <?php 
                         if ($raceStarted) {
-                            echo "Noch keine Ergebnisse erfasst. Die Ergebnisse werden während des Rennens hier angezeigt.";
+                            echo "Noch keine Ergebnisse erfasst. Die Ergebnisse werden whrend des Rennens hier angezeigt.";
                         } else {
-                            echo "Noch keine Ergebnisse verfügbar. Das Rennen beginnt am " . getSetting('race_date_saturday') . ".";
+                            echo "Noch keine Ergebnisse verfgbar. Das Rennen beginnt am " . getSetting('race_date_saturday') . ".";
                         }
                         ?>
                     </p>
@@ -130,9 +130,6 @@ unset($_SESSION['success']);
                                     <th>Platz</th>
                                     <th>Mannschaft</th>
                                     <th>Rennzeit</th>
-                                    <?php if ($raceFinished || isAdmin()): ?>
-                                        <th>Strafsekunden</th>
-                                    <?php endif; ?>
                                     <th>Endzeit</th>
                                     <th>Renntag</th>
                                     <th>Startzeit</th>
@@ -150,9 +147,6 @@ unset($_SESSION['success']);
                                         <td><?php echo $index + 1; ?></td>
                                         <td><?php echo htmlspecialchars($r['team_name']); ?></td>
                                         <td><?php echo htmlspecialchars($r['time']); ?></td>
-                                        <?php if ($raceFinished || isAdmin()): ?>
-                                            <td><?php echo $r['penalty_seconds']; ?></td>
-                                        <?php endif; ?>
                                         <td><?php echo htmlspecialchars($r['final_time']); ?></td>
                                         <td><?php echo htmlspecialchars($r['race_date'] ?? ''); ?></td>
                                         <td><?php echo htmlspecialchars($r['start_time'] ?? ''); ?></td>
@@ -168,7 +162,7 @@ unset($_SESSION['success']);
                 <div class="card-body">
                     <p class="note">
                         <strong>Hinweis:</strong> Die Ergebnisse werden automatisch alle 30 Sekunden aktualisiert.<br>
-                        Die Platzierung erfolgt nach der Endzeit (Rennzeit + Strafsekunden).
+                        Die Platzierung erfolgt nach der Endzeit.
                     </p>
                 </div>
             </div>
