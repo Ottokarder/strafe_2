@@ -128,11 +128,14 @@ if ($action === 'save_result' && $startTimeId) {
     if ($existingResult) {
         // Ergebnis aktualisieren
         $updated = execute("UPDATE results SET time = ? WHERE id = ?", "si", [$dbTime, $existingResult['id']]);
-        if ($updated) {
+        if ($updated > 0) {
             logAudit('UPDATE', 'results', $existingResult['id'], ['time' => $existingResult['time']], ['time' => $dbTime]);
             redirectWithSuccess('start_times.php', 'Rennergebnis erfolgreich aktualisiert.');
         } else {
-            redirectWithError('start_times.php', 'Fehler beim Aktualisieren des Ergebnisses.');
+            // Debug-Info
+            $errorMsg = 'Fehler beim Aktualisieren des Ergebnisses. ID: ' . $existingResult['id'] . ', Zeit: ' . $dbTime;
+            error_log($errorMsg);
+            redirectWithError('start_times.php', $errorMsg);
         }
     } else {
         // Neues Ergebnis erstellen
@@ -144,7 +147,10 @@ if ($action === 'save_result' && $startTimeId) {
             logAudit('INSERT', 'results', $resultId, [], ['team_id' => $startTime['team_id'], 'start_time_id' => $startTimeId, 'time' => $dbTime]);
             redirectWithSuccess('start_times.php', 'Rennergebnis erfolgreich gespeichert.');
         } else {
-            redirectWithError('start_times.php', 'Fehler beim Speichern des Ergebnisses.');
+            // Debug-Info
+            $errorMsg = 'Fehler beim Speichern des Ergebnisses. SQL: INSERT INTO results (team_id, start_time_id, time) VALUES (' . $startTime['team_id'] . ', ' . $startTimeId . ', \'' . $dbTime . '\')';
+            error_log($errorMsg);
+            redirectWithError('start_times.php', $errorMsg);
         }
     }
 }
