@@ -81,9 +81,7 @@ unset($_SESSION['success']);
             <h1>Kanadierrennen CJD Kaltenstein</h1>
             <p class="hero-subtitle">
                 <?php 
-                if ($raceFinished) {
-                    echo "Das Rennen ist beendet. Hier sind die finalen Ergebnisse.";
-                } elseif ($raceStarted) {
+                if ($raceStarted) {
                     echo "Das Rennen läuft! Hier sind die aktuellen Ergebnisse in Echtzeit.";
                 } elseif ($reservationOpen) {
                     echo "Die Reservierung der Startzeiten ist jetzt möglich.";

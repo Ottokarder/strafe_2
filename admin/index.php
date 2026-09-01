@@ -69,35 +69,24 @@ unset($_SESSION['success']);
                 </div>
             </div>
             
-            <div class="card">
-                <div class="card-header">
-                    <h3>Startzeiten</h3>
-                </div>
-                <div class="card-body">
-                    <p class="stat-number"><?php echo $startTimeCount['count']; ?></p>
-                    <p>gebuchte Startzeiten</p>
-                    <p class="stat-small"><?php echo $freeStartTimes['count']; ?> frei</p>
-                    <a href="/admin/start_times.php" class="btn btn-primary">Verwalten</a>
-                </div>
-            </div>
-            
+
             <div class="card">
                 <div class="card-header">
                     <h3>Mannschaften ohne Startzeit</h3>
                 </div>
                 <div class="card-body">
                     <?php 
-                    $teamsWithoutStart = fetchAll("SELECT t.name, t.id FROM teams t LEFT JOIN start_times st ON t.id = st.team_id WHERE st.team_id IS NULL");
+                    $teamsWithoutStart = fetchAll("SELECT t.name, t.id, t.startklasse FROM teams t LEFT JOIN start_times st ON t.id = st.team_id WHERE st.team_id IS NULL OR t.startklasse IS NULL OR t.startklasse = ''");
                     if (empty($teamsWithoutStart)):
                     ?>
                         <p class="stat-number">0</p>
                         <p>Alle Mannschaften haben Startzeiten</p>
                     <?php else: ?>
                         <p class="stat-number"><?php echo count($teamsWithoutStart); ?></p>
-                        <p>Mannschaften ohne Startzeit:</p>
+                        <p>Mannschaften ohne Startzeit oder Startklasse:</p>
                         <ul style="margin-top: 1rem; padding-left: 1.5rem;">
                             <?php foreach ($teamsWithoutStart as $team): ?>
-                                <li><?php echo htmlspecialchars($team['name']); ?></li>
+                                <li><?php echo htmlspecialchars($team['name']); ?> <?php echo $team['startklasse'] ? '(Startklasse: ' . htmlspecialchars($team['startklasse']) . ')' : '(ohne Startklasse)'; ?></li>
                             <?php endforeach; ?>
                         </ul>
                     <?php endif; ?>
