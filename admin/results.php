@@ -65,22 +65,29 @@ if ($action === 'edit' || $action === 'add') {
         if (!validateCSRFToken($csrfToken)) {
             $error = 'Ungültiges CSRF-Token.';
         } else {
-            $data = [
-                'team_id' => (int)($_POST['team_id'] ?? 0),
-                'start_time_id' => !empty($_POST['start_time_id']) ? (int)$_POST['start_time_id'] : null,
-                'time' => validateInput($_POST['time'] ?? '')
-            ];
+            $timeInput = trim($_POST['time'] ?? '');
+                    
+                    $data = [
+                        'team_id' => (int)($_POST['team_id'] ?? 0),
+                        'start_time_id' => !empty($_POST['start_time_id']) ? (int)$_POST['start_time_id'] : null,
+                        'time' => $timeInput
+                    ];
             
             // Validierung
             if (empty($data['team_id'])) {
                 $error = 'Bitte wählen Sie eine Mannschaft aus.';
             } elseif (empty($data['time'])) {
                 $error = 'Bitte geben Sie eine Zeit ein.';
-            } elseif (!validateTime($data['time'])) {
-                $error = 'Bitte geben Sie eine gültige Zeit ein (MM:SS).';
+            } elseif (!validateTimeMMSS($data['time'])) {
+                $error = 'Bitte geben Sie eine gültige Zeit im Format MM:SS ein (z. B. 45:23).';
             }
             
             if (!$error) {
+                // MM:SS in HH:MM:SS umwandeln für die Datenbank
+                list($minutes, $seconds) = explode(':', $data['time']);
+                $dbTime = sprintf('%02d:%02d:%02d', 0, (int)$minutes, (int)$seconds);
+                $data['time'] = $dbTime;
+                
                 if ($action === 'add') {
                     // Neues Ergebnis erstellen
                     $resultId = createResult($data);

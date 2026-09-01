@@ -87,8 +87,18 @@ foreach ($startTimes as $st) {
                     <div class="form-group">
                         <label for="time">Rennzeit * (MM:SS)</label>
                         <input type="text" id="time" name="time" 
-                               value="<?php echo htmlspecialchars($result['time']); ?>" 
-                               placeholder="MM:SS" required>
+                               value="<?php 
+                               // HH:MM:SS in MM:SS umwandeln für die Anzeige
+                               if (!empty($result['time'])) {
+                                   $parts = explode(':', $result['time']);
+                                   if (count($parts) === 3 && $parts[0] === '00') {
+                                       echo htmlspecialchars($parts[1] . ':' . $parts[2]);
+                                   } else {
+                                       echo htmlspecialchars($result['time']);
+                                   }
+                               }
+                               ?>" 
+                               placeholder="MM:SS" pattern="[0-5]?[0-9]:[0-5][0-9]" required>
                         <small>Format: Minuten:Sekunden (z. B. 45:23)</small>
                     </div>
                     

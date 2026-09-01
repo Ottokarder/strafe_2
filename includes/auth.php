@@ -171,6 +171,16 @@ function validateTime($time) {
 }
 
 /**
+ * Zeit validieren (nur MM:SS Format)
+ * @param string $time Zeit
+ * @return bool
+ */
+function validateTimeMMSS($time) {
+    // Nur MM:SS Format (0-59 Minuten, 0-59 Sekunden)
+    return preg_match('/^([0-5]?[0-9]):[0-5][0-9]$/', $time);
+}
+
+/**
  * Datum validieren (YYYY-MM-DD)
  * @param string $date Datum
  * @return bool
