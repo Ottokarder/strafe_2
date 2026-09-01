@@ -16,9 +16,9 @@ if (!isAdmin()) {
 checkSessionTimeout();
 
 // Aktionen verarbeiten
-$action = $_GET['action'] ?? '';
-$startTimeId = $_GET['id'] ?? null;
-$teamId = $_GET['team_id'] ?? null;
+$action = $_REQUEST['action'] ?? '';
+$startTimeId = $_REQUEST['id'] ?? null;
+$teamId = $_REQUEST['team_id'] ?? null;
 
 // Fehler und Erfolgsmeldungen
 $error = $_SESSION['error'] ?? null;
