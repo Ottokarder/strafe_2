@@ -72,7 +72,7 @@ unset($_SESSION['success']);
 
             <div class="card">
                 <div class="card-header">
-                    <h3>Mannschaften ohne Startzeit</h3>
+                    <h3>Mannschaften ohne Zuordnung</h3>
                 </div>
                 <div class="card-body">
                     <?php 
