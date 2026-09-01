@@ -131,16 +131,15 @@ unset($_SESSION['success']);
                                             <th>Platz</th>
                                             <th>Mannschaft</th>
                                             <th>Rennzeit</th>
-                                            <th>Endzeit</th>
                                             <th>Renntag</th>
                                             <th>Startzeit</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php 
-                                        // Sortieren nach Endzeit
+                                        // Sortieren nach Rennzeit
                                         usort($classResults, function($a, $b) {
-                                            return strtotime($a['final_time']) <=> strtotime($b['final_time']);
+                                            return strtotime($a['time']) <=> strtotime($b['time']);
                                         });
                                         
                                         foreach ($classResults as $index => $r): ?>
@@ -148,7 +147,6 @@ unset($_SESSION['success']);
                                                 <td><?php echo $index + 1; ?></td>
                                                 <td><?php echo htmlspecialchars($r['team_name']); ?></td>
                                                 <td><?php echo htmlspecialchars($r['time']); ?></td>
-                                                <td><?php echo htmlspecialchars($r['final_time']); ?></td>
                                                 <td><?php echo htmlspecialchars($r['race_date'] ?? ''); ?></td>
                                                 <td><?php echo htmlspecialchars($r['start_time'] ?? ''); ?></td>
                                             </tr>

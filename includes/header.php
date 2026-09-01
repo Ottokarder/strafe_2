@@ -49,13 +49,6 @@ $currentPage = $_SERVER['PHP_SELF'];
                             Startzeiten
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a href="<?php echo strpos($currentPage, 'admin') !== false ? 'results.php' : 'ergebnisse.php'; ?>" 
-                           class="nav-link <?php echo $currentPage === 'ergebnisse.php' || $currentPage === 'results.php' ? 'active' : ''; ?>">
-                            Ergebnisse
-                        </a>
-                    </li>
-                    
                     <?php if (isAdmin()): ?>
                         <li class="nav-item">
                             <a href="<?php echo strpos($currentPage, 'admin') !== false ? 'index.php' : 'admin/index.php'; ?>" 

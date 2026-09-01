@@ -193,7 +193,7 @@ $selectedClass = $_GET['class'] ?? '';
                                         <th>Mannschaft</th>
                                         <th>Rennzeit</th>
                                         <th>Strafsekunden</th>
-                                        <th>Endzeit</th>
+                                        <th>Rennzeit</th>
                                         <th>Renntag</th>
                                         <th>Startzeit</th>
                                         <th>Aktionen</th>
@@ -201,9 +201,9 @@ $selectedClass = $_GET['class'] ?? '';
                                 </thead>
                                 <tbody>
                                     <?php 
-                                    // Sortieren nach Endzeit
+                                    // Sortieren nach Rennzeit
                                     usort($classResults, function($a, $b) {
-                                        return strtotime($a['final_time']) <=> strtotime($b['final_time']);
+                                        return strtotime($a['time']) <=> strtotime($b['time']);
                                     });
                                     
                                     foreach ($classResults as $index => $r): ?>
@@ -212,7 +212,7 @@ $selectedClass = $_GET['class'] ?? '';
                                             <td><?php echo htmlspecialchars($r['team_name']); ?></td>
                                             <td><?php echo htmlspecialchars($r['time']); ?></td>
                                             <td><?php echo $r['penalty_seconds']; ?></td>
-                                            <td><?php echo htmlspecialchars($r['final_time']); ?></td>
+                                            <td><?php echo htmlspecialchars($r['time']); ?></td>
                                             <td><?php echo htmlspecialchars($r['race_date'] ?? ''); ?></td>
                                             <td><?php echo htmlspecialchars($r['start_time'] ?? ''); ?></td>
                                             <td>

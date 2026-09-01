@@ -130,16 +130,16 @@ unset($_SESSION['success']);
                                     <th>Platz</th>
                                     <th>Mannschaft</th>
                                     <th>Rennzeit</th>
-                                    <th>Endzeit</th>
+                                    <th>Rennzeit</th>
                                     <th>Renntag</th>
                                     <th>Startzeit</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php 
-                                // Sortieren nach Endzeit
+                                // Sortieren nach Rennzeit
                                 usort($classResults, function($a, $b) {
-                                    return strtotime($a['final_time']) <=> strtotime($b['final_time']);
+                                    return strtotime($a['time']) <=> strtotime($b['time']);
                                 });
                                 
                                 foreach ($classResults as $index => $r): ?>
@@ -147,7 +147,7 @@ unset($_SESSION['success']);
                                         <td><?php echo $index + 1; ?></td>
                                         <td><?php echo htmlspecialchars($r['team_name']); ?></td>
                                         <td><?php echo htmlspecialchars($r['time']); ?></td>
-                                        <td><?php echo htmlspecialchars($r['final_time']); ?></td>
+                                        <td><?php echo htmlspecialchars($r['time']); ?></td>
                                         <td><?php echo htmlspecialchars($r['race_date'] ?? ''); ?></td>
                                         <td><?php echo htmlspecialchars($r['start_time'] ?? ''); ?></td>
                                     </tr>
@@ -162,7 +162,7 @@ unset($_SESSION['success']);
                 <div class="card-body">
                     <p class="note">
                         <strong>Hinweis:</strong> Die Ergebnisse werden automatisch alle 30 Sekunden aktualisiert.<br>
-                        Die Platzierung erfolgt nach der Endzeit.
+                        Die Platzierung erfolgt nach der Rennzeit.
                     </p>
                 </div>
             </div>

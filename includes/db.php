@@ -288,7 +288,7 @@ function getAllResults() {
                      FROM results r 
                      JOIN teams t ON r.team_id = t.id 
                      LEFT JOIN start_times st ON r.start_time_id = st.id 
-                     ORDER BY t.startklasse, r.final_time");
+                     ORDER BY t.startklasse, r.time");
 }
 
 /**
@@ -342,7 +342,7 @@ function getResultsByClass($startklasse) {
                      JOIN teams t ON r.team_id = t.id 
                      LEFT JOIN start_times st ON r.start_time_id = st.id 
                      WHERE t.startklasse = ? 
-                     ORDER BY r.final_time", "s", [$startklasse]);
+                     ORDER BY r.time", "s", [$startklasse]);
 }
 
 /**
@@ -452,7 +452,7 @@ function logAudit($action, $tableName, $recordId, $oldValues = [], $newValues = 
  * Startzeiten für einen Tag generieren
  * @param string $date Datum
  * @param string $startTime Startzeit
- * @param string $endTime Endzeit
+ * @param string $endTime Rennzeit
  * @param int $interval Intervall in Minuten
  * @return int Anzahl der erstellten Startzeiten
  */
@@ -518,8 +518,6 @@ function exportResultsToCSV($startklasse = null) {
                 t.name AS 'Mannschaft',
                 t.startklasse AS 'Startklasse',
                 r.time AS 'Rennzeit',
-                r.penalty_seconds AS 'Strafsekunden',
-                r.final_time AS 'Endzeit',
                 st.date AS 'Renntag',
                 st.time AS 'Startzeit'
               FROM results r 
@@ -535,7 +533,7 @@ function exportResultsToCSV($startklasse = null) {
         $types = "s";
     }
     
-    $query .= " ORDER BY t.startklasse, r.final_time";
+    $query .= " ORDER BY t.startklasse, r.time";
     
     $results = fetchAll($query, $types, $params);
     
@@ -544,17 +542,15 @@ function exportResultsToCSV($startklasse = null) {
     }
     
     // Header
-    $csv = "Mannschaft;Startklasse;Rennzeit;Strafsekunden;Endzeit;Renntag;Startzeit\n";
+    $csv = "Mannschaft;Startklasse;Rennzeit;Renntag;Startzeit\n";
     
     // Daten
     foreach ($results as $row) {
         $csv .= sprintf(
-            "%s;%s;%s;%d;%s;%s;%s\n",
+            "%s;%s;%s;%s;%s\n",
             escapeCSV($row['Mannschaft']),
             escapeCSV($row['Startklasse']),
             escapeCSV($row['Rennzeit']),
-            $row['Strafsekunden'] ?? 0,
-            escapeCSV($row['Endzeit']),
             escapeCSV($row['Renntag']),
             escapeCSV($row['Startzeit'])
         );
