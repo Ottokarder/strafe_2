@@ -136,10 +136,10 @@ if ($action === 'save_result' && $startTimeId) {
         }
     } else {
         // Neues Ergebnis erstellen
-        $resultId = execute("INSERT INTO results (team_id, start_time_id, time) VALUES (?, ?, ?)", "iis", 
+        $inserted = execute("INSERT INTO results (team_id, start_time_id, time) VALUES (?, ?, ?)", "iis", 
             [$startTime['team_id'], $startTimeId, $dbTime]);
         
-        if ($resultId) {
+        if ($inserted > 0) {
             $resultId = getLastInsertId();
             logAudit('INSERT', 'results', $resultId, [], ['team_id' => $startTime['team_id'], 'start_time_id' => $startTimeId, 'time' => $dbTime]);
             redirectWithSuccess('start_times.php', 'Rennergebnis erfolgreich gespeichert.');
@@ -349,7 +349,8 @@ sort($allDates);
                 <button class="close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
             </div>
             
-            <form id="resultForm" method="POST" action="start_times.php?action=save_result">
+            <form id="resultForm" method="POST" action="start_times.php">
+                <input type="hidden" name="action" value="save_result">
                 <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                 <input type="hidden" name="id" id="resultStartTimeId" value="">
                 
