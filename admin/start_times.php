@@ -4,10 +4,14 @@
  * Kombinierte Ansicht für Startzeiten, Mannschaftszuordnung und Ergebniserfassung
  */
 
-session_start();
-
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
+
+// Session sollte bereits durch config.php gestartet sein
+// Falls nicht, hier als Fallback
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Zugriff prüfen
 if (!isAdmin()) {

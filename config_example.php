@@ -7,9 +7,24 @@
  */
 
 // ============================================
-// SESSION MUSS GANZ AM ANFANG GESTARTET WERDEN
-// BEVOR IRGENDWELCHE HEADERS ODER OUTPUT GESENDET WIRD
+// WICHTIG: Session-Einstellungen müssen VOR session_start() gesetzt werden!
 // ============================================
+
+// Fehlerbehandlung
+error_reporting(E_ALL);
+ini_set('display_errors', 0); // Im Produktionsmodus auf 0 setzen
+ini_set('log_errors', 1);
+ini_set('error_log', __DIR__ . '/error.log');
+
+// Zeitzone setzen
+date_default_timezone_set('Europe/Berlin');
+
+// Session-Einstellungen (MÜSSEN VOR session_start() stehen!)
+ini_set('session.cookie_lifetime', 0); // Session endet beim Schließen des Browsers
+ini_set('session.cookie_secure', false); // Nur HTTPS verwenden, falls verfügbar
+ini_set('session.cookie_httponly', true); // Schutz vor XSS
+
+// Jetzt Session starten
 session_start();
 
 // Datenbank-Verbindung (MariaDB)
@@ -40,20 +55,6 @@ define('SUNDAY_END', '16:00');
 
 // Pfad zum Logo (relativ zu index.php)
 define('LOGO_PATH', 'assets/images/logo.png');
-
-// Fehlerbehandlung
-error_reporting(E_ALL);
-ini_set('display_errors', 0); // Im Produktionsmodus auf 0 setzen
-ini_set('log_errors', 1);
-ini_set('error_log', __DIR__ . '/error.log');
-
-// Zeitzone setzen
-date_default_timezone_set('Europe/Berlin');
-
-// Session-Einstellungen (nach session_start!)
-ini_set('session.cookie_lifetime', 0); // Session endet beim Schließen des Browsers
-ini_set('session.cookie_secure', false); // Nur HTTPS verwenden, falls verfügbar
-ini_set('session.cookie_httponly', true); // Schutz vor XSS
 
 // Sicherheitsheader
 header("X-Frame-Options: DENY");
