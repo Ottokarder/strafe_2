@@ -56,11 +56,6 @@ define('SUNDAY_END', '16:00');
 // Pfad zum Logo (relativ zu index.php)
 define('LOGO_PATH', 'assets/images/logo.png');
 
-// Sicherheitsheader
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:");
-
 // Startklassen
 $startklassen = [
     'Damen',
