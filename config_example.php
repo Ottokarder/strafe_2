@@ -6,6 +6,12 @@
  * config.php WIRD NICHT IN GITHUB ÜBERTRAGEN!
  */
 
+// ============================================
+// SESSION MUSS GANZ AM ANFANG GESTARTET WERDEN
+// BEVOR IRGENDWELCHE HEADERS ODER OUTPUT GESENDET WIRD
+// ============================================
+session_start();
+
 // Datenbank-Verbindung (MariaDB)
 define('DB_HOST', 'localhost');      // Datenbank-Host (z. B. localhost oder IP)
 define('DB_USER', 'dein_benutzername'); // Datenbank-Benutzername
@@ -44,11 +50,10 @@ ini_set('error_log', __DIR__ . '/error.log');
 // Zeitzone setzen
 date_default_timezone_set('Europe/Berlin');
 
-// Session-Einstellungen
+// Session-Einstellungen (nach session_start!)
 ini_set('session.cookie_lifetime', 0); // Session endet beim Schließen des Browsers
 ini_set('session.cookie_secure', false); // Nur HTTPS verwenden, falls verfügbar
 ini_set('session.cookie_httponly', true); // Schutz vor XSS
-session_start();
 
 // Sicherheitsheader
 header("X-Frame-Options: DENY");
