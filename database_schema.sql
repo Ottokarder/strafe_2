@@ -44,8 +44,6 @@ CREATE TABLE IF NOT EXISTS `results` (
     `team_id` INT NOT NULL,
     `start_time_id` INT,
     `time` TIME NOT NULL,
-    `penalty_seconds` INT DEFAULT 0,
-    `final_time` TIME GENERATED ALWAYS AS (ADDTIME(`time`, SEC_TO_TIME(`penalty_seconds`))) STORED,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX `idx_team_id` (`team_id`),
@@ -135,14 +133,12 @@ SELECT
     t.name AS team_name,
     t.startklasse,
     r.time AS race_time,
-    r.penalty_seconds,
-    r.final_time,
     st.date AS race_date,
     st.time AS start_time
 FROM results r
 JOIN teams t ON r.team_id = t.id
 LEFT JOIN start_times st ON r.start_time_id = st.id
-ORDER BY t.startklasse, r.final_time;
+ORDER BY t.startklasse, r.time;
 
 -- Mannschaftsübersicht mit Startzeiten
 CREATE OR REPLACE VIEW `team_overview` AS
@@ -154,7 +150,7 @@ SELECT
     t.email,
     GROUP_CONCAT(CONCAT(st.date, ' ', st.time) SEPARATOR ', ') AS start_times,
     COUNT(st.id) AS start_count,
-    MIN(r.final_time) AS best_time
+    MIN(r.time) AS best_time
 FROM teams t
 LEFT JOIN start_times st ON t.id = st.team_id
 LEFT JOIN results r ON t.id = r.team_id
@@ -318,7 +314,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'results', NEW.id,
-            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
+            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time),
             IFNULL(@current_ip, 'localhost'));
 END//
 
@@ -329,8 +325,8 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'results', NEW.id,
-            JSON_OBJECT('team_id', OLD.team_id, 'start_time_id', OLD.start_time_id, 'time', OLD.time, 'penalty_seconds', OLD.penalty_seconds),
-            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time, 'penalty_seconds', NEW.penalty_seconds),
+            JSON_OBJECT('team_id', OLD.team_id, 'start_time_id', OLD.start_time_id, 'time', OLD.time),
+            JSON_OBJECT('team_id', NEW.team_id, 'start_time_id', NEW.start_time_id, 'time', NEW.time),
             IFNULL(@current_ip, 'localhost'));
 END//
 
