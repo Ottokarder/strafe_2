@@ -477,6 +477,8 @@ function generateStartTimesForDay($date, $startTime, $endTime, $interval) {
 
 /**
  * Alle Startzeiten zurücksetzen
+ * Löscht auch alle Mannschaften, Ergebnisse und Audit-Logs (außer users und settings)
+ * Setzt die Auto-Increment-IDs der Tabellen zurück
  * @return int Anzahl der erstellten Startzeiten
  */
 function resetAllStartTimes() {
@@ -488,11 +490,22 @@ function resetAllStartTimes() {
     $sundayEnd = getSetting('sunday_end_time') ?? SUNDAY_END;
     $interval = (int)(getSetting('start_interval_minutes') ?? START_INTERVAL);
     
+    $conn = getDBConnection();
+    
     beginTransaction();
     
     try {
-        // Alle Startzeiten löschen
+        // Alle verbundenen Tabellen löschen (außer users und settings)
+        execute("DELETE FROM results");
         execute("DELETE FROM start_times");
+        execute("DELETE FROM teams");
+        execute("DELETE FROM audit_log");
+        
+        // Auto-Increment-IDs zurücksetzen
+        execute("ALTER TABLE results AUTO_INCREMENT = 1");
+        execute("ALTER TABLE start_times AUTO_INCREMENT = 1");
+        execute("ALTER TABLE teams AUTO_INCREMENT = 1");
+        execute("ALTER TABLE audit_log AUTO_INCREMENT = 1");
         
         // Samstag
         $saturdayCount = generateStartTimesForDay($saturdayDate, $saturdayStart, $saturdayEnd, $interval);
