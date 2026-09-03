@@ -583,12 +583,14 @@ function resetAllStartTimes() {
         execute("DELETE FROM results");
         execute("DELETE FROM start_times");
         execute("DELETE FROM teams");
+        execute("DELETE FROM captains");
         execute("DELETE FROM audit_log");
         
         // Auto-Increment-IDs zurücksetzen
         execute("ALTER TABLE results AUTO_INCREMENT = 1");
         execute("ALTER TABLE start_times AUTO_INCREMENT = 1");
         execute("ALTER TABLE teams AUTO_INCREMENT = 1");
+        execute("ALTER TABLE captains AUTO_INCREMENT = 1");
         execute("ALTER TABLE audit_log AUTO_INCREMENT = 1");
         
         // Samstag
