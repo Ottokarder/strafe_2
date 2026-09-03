@@ -26,13 +26,23 @@ if ($action === 'add') {
         'id' => null,
         'name' => '',
         'startklasse' => '',
-        'kapitaen' => '',
-        'email' => ''
+        'captain_id' => null,
+        'captain_name' => '',
+        'captain_email' => ''
     ];
+} else {
+    // Team-Daten abrufen
+    $team = getTeamById($teamId);
+    if (!$team) {
+        redirectWithError('/admin/teams.php', 'Mannschaft nicht gefunden.');
+    }
 }
 
 // Alle Startklassen abrufen
 $startklassen = getStartklassen();
+
+// Alle Kapitäne abrufen
+$captains = getAllCaptains();
 
 // CSRF-Token generieren
 $csrfToken = generateCSRFToken();
@@ -40,7 +50,6 @@ $csrfToken = generateCSRFToken();
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
 
-    
     <div class="container">
         <div class="page-header">
             <h1><?php echo $action === 'add' ? 'Neue Mannschaft hinzufügen' : 'Mannschaft bearbeiten'; ?></h1>
@@ -80,14 +89,22 @@ $csrfToken = generateCSRFToken();
                     </div>
                     
                     <div class="form-group">
-                        <label for="kapitaen">Kapitän *</label>
-                        <input type="text" id="kapitaen" name="kapitaen" value="<?php echo htmlspecialchars($team['kapitaen']); ?>" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email">E-Mail *</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($team['email']); ?>" required>
-                        <small>Diese E-Mail wird nicht öffentlich angezeigt.</small>
+                        <label for="captain_id">Kapitän *</label>
+                        <select id="captain_id" name="captain_id" required>
+                            <option value="">-- Kapitän auswählen --</option>
+                            <?php foreach ($captains as $captain): ?>
+                                <option value="<?php echo $captain['id']; ?>" 
+                                    <?php echo $team['captain_id'] == $captain['id'] ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($captain['name']); ?>
+                                    <?php if (!empty($captain['email'])): ?>
+                                        (<?php echo htmlspecialchars($captain['email']); ?>)
+                                    <?php endif; ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <small>
+                            <a href="/admin/captains.php?action=add&return_to=teams" style="color: #007bff;">Neuen Kapitän hinzufügen</a>
+                        </small>
                     </div>
                     
                     <div class="form-actions">

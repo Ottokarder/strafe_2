@@ -158,11 +158,68 @@ function tableExists($tableName) {
 }
 
 /**
+ * Alle Kapitäne abrufen
+ * @return array
+ */
+function getAllCaptains() {
+    return fetchAll("SELECT * FROM captains ORDER BY name");
+}
+
+/**
+ * Kapitän nach ID abrufen
+ * @param int $id Kapitän-ID
+ * @return array|null
+ */
+function getCaptainById($id) {
+    return fetchOne("SELECT * FROM captains WHERE id = ?", "i", [$id]);
+}
+
+/**
+ * Kapitän erstellen
+ * @param array $data Kapitän-Daten
+ * @return int Kapitän-ID
+ */
+function createCaptain($data) {
+    $sql = "INSERT INTO captains (name, email, phone) VALUES (?, ?, ?)";
+    execute($sql, "sss", [
+        $data['name'],
+        $data['email'] ?? null,
+        $data['phone'] ?? null
+    ]);
+    return getLastInsertId();
+}
+
+/**
+ * Kapitän aktualisieren
+ * @param int $id Kapitän-ID
+ * @param array $data Kapitän-Daten
+ * @return bool
+ */
+function updateCaptain($id, $data) {
+    $sql = "UPDATE captains SET name = ?, email = ?, phone = ? WHERE id = ?";
+    return execute($sql, "sssi", [
+        $data['name'],
+        $data['email'] ?? null,
+        $data['phone'] ?? null,
+        $id
+    ]) > 0;
+}
+
+/**
+ * Kapitän löschen
+ * @param int $id Kapitän-ID
+ * @return bool
+ */
+function deleteCaptain($id) {
+    return execute("DELETE FROM captains WHERE id = ?", "i", [$id]) > 0;
+}
+
+/**
  * Alle Teams abrufen
  * @return array
  */
 function getAllTeams() {
-    return fetchAll("SELECT * FROM teams ORDER BY COALESCE(startklasse, ''), name");
+    return fetchAll("SELECT t.*, c.name AS captain_name, c.email AS captain_email, c.phone AS captain_phone FROM teams t LEFT JOIN captains c ON t.captain_id = c.id ORDER BY COALESCE(t.startklasse, ''), t.name");
 }
 
 /**
@@ -171,7 +228,7 @@ function getAllTeams() {
  * @return array|null
  */
 function getTeamById($id) {
-    return fetchOne("SELECT * FROM teams WHERE id = ?", "i", [$id]);
+    return fetchOne("SELECT t.*, c.name AS captain_name, c.email AS captain_email, c.phone AS captain_phone FROM teams t LEFT JOIN captains c ON t.captain_id = c.id WHERE t.id = ?", "i", [$id]);
 }
 
 /**
@@ -183,12 +240,11 @@ function createTeam($data) {
     beginTransaction();
     
     try {
-        $sql = "INSERT INTO teams (name, startklasse, kapitaen, email) VALUES (?, ?, ?, ?)";
-        execute($sql, "ssss", [
+        $sql = "INSERT INTO teams (name, startklasse, captain_id) VALUES (?, ?, ?)";
+        execute($sql, "ssi", [
             $data['name'],
             $data['startklasse'] ?? null,
-            $data['kapitaen'],
-            $data['email']
+            $data['captain_id'] ?? null
         ]);
         
         $teamId = getLastInsertId();
@@ -207,12 +263,11 @@ function createTeam($data) {
  * @return bool
  */
 function updateTeam($id, $data) {
-    $sql = "UPDATE teams SET name = ?, startklasse = ?, kapitaen = ?, email = ? WHERE id = ?";
-    return execute($sql, "ssssi", [
+    $sql = "UPDATE teams SET name = ?, startklasse = ?, captain_id = ? WHERE id = ?";
+    return execute($sql, "ssii", [
         $data['name'],
         $data['startklasse'] ?? null,
-        $data['kapitaen'],
-        $data['email'],
+        $data['captain_id'] ?? null,
         $id
     ]) > 0;
 }
@@ -232,6 +287,15 @@ function deleteTeam($id) {
  */
 function getAllStartTimes() {
     return fetchAll("SELECT st.*, t.name AS team_name, t.startklasse FROM start_times st LEFT JOIN teams t ON st.team_id = t.id ORDER BY st.date, st.time");
+}
+
+/**
+ * Startzeit nach ID abrufen
+ * @param int $id Startzeit-ID
+ * @return array|null
+ */
+function getStartTimeById($id) {
+    return fetchOne("SELECT st.*, t.name AS team_name, t.startklasse FROM start_times st LEFT JOIN teams t ON st.team_id = t.id WHERE st.id = ?", "i", [$id]);
 }
 
 /**
@@ -264,7 +328,27 @@ function assignStartTimeToTeam($startTimeId, $teamId) {
  * @return bool
  */
 function removeStartTimeFromTeam($startTimeId) {
-    return execute("UPDATE start_times SET team_id = NULL, is_booked = FALSE WHERE id = ?", "i", [$startTimeId]) > 0;
+    return execute("UPDATE start_times SET team_id = NULL, is_booked = FALSE, paid = FALSE, notes = NULL WHERE id = ?", "i", [$startTimeId]) > 0;
+}
+
+/**
+ * Startzeit als bezahlt markieren
+ * @param int $startTimeId Startzeit-ID
+ * @param bool $paid Bezahlstatus
+ * @return bool
+ */
+function setStartTimePaid($startTimeId, $paid = true) {
+    return execute("UPDATE start_times SET paid = ? WHERE id = ?", "ii", [$paid ? 1 : 0, $startTimeId]) > 0;
+}
+
+/**
+ * Notizen für Startzeit speichern
+ * @param int $startTimeId Startzeit-ID
+ * @param string $notes Notizen
+ * @return bool
+ */
+function saveStartTimeNotes($startTimeId, $notes) {
+    return execute("UPDATE start_times SET notes = ? WHERE id = ?", "si", [$notes, $startTimeId]) > 0;
 }
 
 /**

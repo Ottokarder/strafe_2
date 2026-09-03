@@ -10,35 +10,52 @@ USE `strafe_2`;
 -- TABELLEN
 -- ============================================
 
--- 1. Mannschaften
+-- 1. Kapitäne
+CREATE TABLE IF NOT EXISTS `captains` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(100) NOT NULL,
+    `email` VARCHAR(255) NULL,
+    `phone` VARCHAR(50) NULL,
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    INDEX `idx_name` (`name`),
+    INDEX `idx_email` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 2. Mannschaften
 CREATE TABLE IF NOT EXISTS `teams` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `startklasse` VARCHAR(50) NOT NULL,
-    `kapitaen` VARCHAR(100) NOT NULL,
-    `email` VARCHAR(255) NOT NULL,
+    `captain_id` INT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX `idx_startklasse` (`startklasse`),
-    INDEX `idx_name` (`name`)
+    INDEX `idx_name` (`name`),
+    INDEX `idx_captain_id` (`captain_id`),
+    FOREIGN KEY (`captain_id`) REFERENCES `captains`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 2. Startzeiten
+-- 3. Startzeiten
 CREATE TABLE IF NOT EXISTS `start_times` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `team_id` INT,
     `date` DATE NOT NULL,
     `time` TIME NOT NULL,
     `is_booked` BOOLEAN DEFAULT FALSE,
+    `paid` BOOLEAN DEFAULT FALSE,
+    `notes` TEXT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     INDEX `idx_team_id` (`team_id`),
     INDEX `idx_date_time` (`date`, `time`),
+    INDEX `idx_paid` (`paid`),
     FOREIGN KEY (`team_id`) REFERENCES `teams`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 3. Ergebnisse
+-- 4. Ergebnisse
 CREATE TABLE IF NOT EXISTS `results` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `team_id` INT NOT NULL,
@@ -52,7 +69,7 @@ CREATE TABLE IF NOT EXISTS `results` (
     FOREIGN KEY (`start_time_id`) REFERENCES `start_times`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 4. Benutzer (für Admin-Authentifizierung)
+-- 5. Benutzer (für Admin-Authentifizierung)
 CREATE TABLE IF NOT EXISTS `users` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `username` VARCHAR(50) NOT NULL UNIQUE,
@@ -63,7 +80,7 @@ CREATE TABLE IF NOT EXISTS `users` (
     INDEX `idx_username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 5. System-Einstellungen
+-- 6. System-Einstellungen
 CREATE TABLE IF NOT EXISTS `settings` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `key` VARCHAR(100) NOT NULL UNIQUE,
@@ -73,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `settings` (
     INDEX `idx_key` (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 6. Logbuch für Änderungen
+-- 7. Logbuch für Änderungen
 CREATE TABLE IF NOT EXISTS `audit_log` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `user_id` INT,
@@ -146,15 +163,16 @@ SELECT
     t.id,
     t.name,
     t.startklasse,
-    t.kapitaen,
-    t.email,
+    c.name AS kapitaen,
+    c.email,
     GROUP_CONCAT(CONCAT(st.date, ' ', st.time) SEPARATOR ', ') AS start_times,
     COUNT(st.id) AS start_count,
     MIN(r.time) AS best_time
 FROM teams t
+LEFT JOIN captains c ON t.captain_id = c.id
 LEFT JOIN start_times st ON t.id = st.team_id
 LEFT JOIN results r ON t.id = r.team_id
-GROUP BY t.id, t.name, t.startklasse, t.kapitaen, t.email
+GROUP BY t.id, t.name, t.startklasse, c.name, c.email
 ORDER BY t.startklasse, t.name;
 
 -- Startzeiten für Samstag
@@ -166,7 +184,9 @@ SELECT
     t.id AS team_id,
     t.name AS team_name,
     t.startklasse,
-    st.is_booked
+    st.is_booked,
+    st.paid,
+    st.notes
 FROM start_times st
 LEFT JOIN teams t ON st.team_id = t.id
 WHERE st.date = (SELECT value FROM settings WHERE `key` = 'race_date_saturday')
@@ -181,7 +201,9 @@ SELECT
     t.id AS team_id,
     t.name AS team_name,
     t.startklasse,
-    st.is_booked
+    st.is_booked,
+    st.paid,
+    st.notes
 FROM start_times st
 LEFT JOIN teams t ON st.team_id = t.id
 WHERE st.date = (SELECT value FROM settings WHERE `key` = 'race_date_sunday')
@@ -255,7 +277,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'teams', NEW.id, 
-            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email), 
+            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'captain_id', NEW.captain_id), 
             IFNULL(@current_ip, 'localhost'));
 END//
 
@@ -266,8 +288,8 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'teams', NEW.id,
-            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
-            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'kapitaen', NEW.kapitaen, 'email', NEW.email),
+            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'captain_id', OLD.captain_id),
+            JSON_OBJECT('name', NEW.name, 'startklasse', NEW.startklasse, 'captain_id', NEW.captain_id),
             IFNULL(@current_ip, 'localhost'));
 END//
 
@@ -278,7 +300,42 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'DELETE', 'teams', OLD.id,
-            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'kapitaen', OLD.kapitaen, 'email', OLD.email),
+            JSON_OBJECT('name', OLD.name, 'startklasse', OLD.startklasse, 'captain_id', OLD.captain_id),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+-- Trigger für Captains
+DROP TRIGGER IF EXISTS after_captain_insert//;
+CREATE TRIGGER after_captain_insert
+AFTER INSERT ON captains
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'captains', NEW.id, 
+            JSON_OBJECT('name', NEW.name, 'email', NEW.email, 'phone', NEW.phone), 
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_captain_update//;
+CREATE TRIGGER after_captain_update
+AFTER UPDATE ON captains
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'captains', NEW.id,
+            JSON_OBJECT('name', OLD.name, 'email', OLD.email, 'phone', OLD.phone),
+            JSON_OBJECT('name', NEW.name, 'email', NEW.email, 'phone', NEW.phone),
+            IFNULL(@current_ip, 'localhost'));
+END//
+
+DROP TRIGGER IF EXISTS after_captain_delete//;
+CREATE TRIGGER after_captain_delete
+AFTER DELETE ON captains
+FOR EACH ROW
+BEGIN
+    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, ip_address)
+    VALUES (IFNULL(@current_user_id, 0), 'DELETE', 'captains', OLD.id,
+            JSON_OBJECT('name', OLD.name, 'email', OLD.email, 'phone', OLD.phone),
             IFNULL(@current_ip, 'localhost'));
 END//
 
@@ -290,7 +347,7 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'INSERT', 'start_times', NEW.id,
-            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
+            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked, 'paid', NEW.paid, 'notes', NEW.notes),
             IFNULL(@current_ip, 'localhost'));
 END//
 
@@ -301,8 +358,8 @@ FOR EACH ROW
 BEGIN
     INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values, ip_address)
     VALUES (IFNULL(@current_user_id, 0), 'UPDATE', 'start_times', NEW.id,
-            JSON_OBJECT('team_id', OLD.team_id, 'date', OLD.date, 'time', OLD.time, 'is_booked', OLD.is_booked),
-            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked),
+            JSON_OBJECT('team_id', OLD.team_id, 'date', OLD.date, 'time', OLD.time, 'is_booked', OLD.is_booked, 'paid', OLD.paid, 'notes', OLD.notes),
+            JSON_OBJECT('team_id', NEW.team_id, 'date', NEW.date, 'time', NEW.time, 'is_booked', NEW.is_booked, 'paid', NEW.paid, 'notes', NEW.notes),
             IFNULL(@current_ip, 'localhost'));
 END//
 

@@ -79,17 +79,14 @@ if ($action === 'edit' || $action === 'add') {
             $data = [
                 'name' => validateInput($_POST['name'] ?? ''),
                 'startklasse' => validateInput($_POST['startklasse'] ?? ''),
-                'kapitaen' => validateInput($_POST['kapitaen'] ?? ''),
-                'email' => validateInput($_POST['email'] ?? '')
+                'captain_id' => !empty($_POST['captain_id']) ? (int)$_POST['captain_id'] : null
             ];
             
             // Validierung
             if (empty($data['name'])) {
                 $error = 'Bitte geben Sie einen Mannschaftsnamen ein.';
-            } elseif (empty($data['kapitaen'])) {
-                $error = 'Bitte geben Sie einen Kapitänsnamen ein.';
-            } elseif (!validateEmail($data['email'])) {
-                $error = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+            } elseif (empty($data['captain_id'])) {
+                $error = 'Bitte wählen Sie einen Kapitän aus.';
             }
             
             if (!$error) {
@@ -132,7 +129,10 @@ foreach ($teams as $key => $team) {
     <div class="container">
         <div class="page-header">
             <h1>Mannschaftsverwaltung</h1>
-            <a href="?action=add" class="btn btn-primary">Neue Mannschaft hinzufügen</a>
+            <div class="header-actions">
+                <a href="?action=add" class="btn btn-primary">Neue Mannschaft hinzufügen</a>
+                <a href="captains.php" class="btn btn-secondary">Kapitäne verwalten</a>
+            </div>
         </div>
         
         <?php if ($error): ?>
@@ -170,7 +170,12 @@ foreach ($teams as $key => $team) {
                                 <tr>
                                     <td><?php echo htmlspecialchars($team['name']); ?></td>
                                     <td><?php echo htmlspecialchars($team['startklasse']); ?></td>
-                                    <td><?php echo htmlspecialchars($team['kapitaen']); ?></td>
+                                    <td>
+                                        <?php echo htmlspecialchars($team['captain_name'] ?? 'Kein Kapitän'); ?>
+                                        <?php if (!empty($team['captain_email'])): ?>
+                                            <br><small><?php echo htmlspecialchars($team['captain_email']); ?></small>
+                                        <?php endif; ?>
+                                    </td>
                                     <td><?php echo $team['start_count']; ?> / <?php echo MAX_STARTS_PER_TEAM; ?></td>
                                     <td>
                                         <a href="?action=edit&id=<?php echo $team['id']; ?>" class="btn btn-small btn-secondary">Bearbeiten</a>

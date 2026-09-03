@@ -162,12 +162,47 @@ if ($action === 'save_result' && $startTimeId) {
     }
 }
 
+// Bezahlstatus aktualisieren
+if ($action === 'toggle_paid' && $startTimeId) {
+    if (!isset($_GET['csrf_token']) || !validateCSRFToken($_GET['csrf_token'])) {
+        redirectWithError('start_times.php', 'Ungültiges CSRF-Token.');
+    }
+    
+    $startTime = getStartTimeById($startTimeId);
+    if (!$startTime) {
+        redirectWithError('start_times.php', 'Startzeit nicht gefunden.');
+    }
+    
+    $newPaidStatus = !$startTime['paid'];
+    if (setStartTimePaid($startTimeId, $newPaidStatus)) {
+        logAudit('UPDATE', 'start_times', $startTimeId, ['paid' => $startTime['paid']], ['paid' => $newPaidStatus]);
+        redirectWithSuccess('start_times.php', 'Bezahlstatus erfolgreich aktualisiert.');
+    } else {
+        redirectWithError('start_times.php', 'Fehler beim Aktualisieren des Bezahlstatus.');
+    }
+}
+
+// Notizen speichern
+if ($action === 'save_notes' && $startTimeId) {
+    if (!isset($_POST['csrf_token']) || !validateCSRFToken($_POST['csrf_token'])) {
+        redirectWithError('start_times.php', 'Ungültiges CSRF-Token.');
+    }
+    
+    $notes = trim($_POST['notes'] ?? '');
+    if (saveStartTimeNotes($startTimeId, $notes)) {
+        logAudit('UPDATE', 'start_times', $startTimeId, [], ['notes' => $notes]);
+        redirectWithSuccess('start_times.php', 'Notizen erfolgreich gespeichert.');
+    } else {
+        redirectWithError('start_times.php', 'Fehler beim Speichern der Notizen.');
+    }
+}
+
 // ============================================
 // DATEN ABRUFEN
 // ============================================
 
 // Alle Teams abrufen (sortiert nach Eingabezeitpunkt, neueste zuerst)
-$teams = fetchAll("SELECT * FROM teams ORDER BY created_at DESC");
+$teams = fetchAll("SELECT t.*, c.name AS captain_name FROM teams t LEFT JOIN captains c ON t.captain_id = c.id ORDER BY t.created_at DESC");
 
 // Alle Startzeiten abrufen
 $startTimes = fetchAll("SELECT st.*, t.name AS team_name, t.startklasse, t.id AS team_id, 
@@ -225,7 +260,7 @@ sort($allDates);
     <div class="card">
         <div class="card-header">
             <h3>Startzeiten nach Datum</h3>
-            <p class="card-subtitle">Klicken Sie auf "Mannschaft zuordnen" um eine Mannschaft auszuwählen, oder auf "Ergebnis eingeben" um die Rennzeit zu erfassen.</p>
+            <p class="card-subtitle">Klicken Sie auf "Mannschaft zuordnen" um eine Mannschaft auszuwählen, oder auf "Ergebnis eingeben" um die Rennzeit zu erfassen. Nutzen Sie die Checkbox "Bezahlt" und das Notizfeld für Anmerkungen.</p>
         </div>
         <div class="card-body">
             <?php if (empty($startTimesByDate)): ?>
@@ -239,10 +274,12 @@ sort($allDates);
                         <table class="table table-striped">
                             <thead>
                                 <tr>
-                                    <th style="width: 100px;">Uhrzeit</th>
-                                    <th style="width: 250px;">Mannschaft</th>
-                                    <th style="width: 150px;">Startklasse</th>
+                                    <th style="width: 80px;">Uhrzeit</th>
+                                    <th style="width: 200px;">Mannschaft</th>
+                                    <th style="width: 120px;">Startklasse</th>
+                                    <th style="width: 80px;">Bezahlt</th>
                                     <th style="width: 120px;">Rennzeit</th>
+                                    <th style="width: 150px;">Notizen</th>
                                     <th style="width: 200px;">Aktionen</th>
                                 </tr>
                             </thead>
@@ -261,6 +298,16 @@ sort($allDates);
                                         <td>
                                             <?php echo $st['team_id'] ? htmlspecialchars($st['startklasse'] ?? '') : '<span style="color: #666;">-</span>'; ?>
                                         </td>
+                                        <td style="text-align: center;">
+                                            <?php if ($st['team_id']): ?>
+                                                <input type="checkbox" 
+                                                       <?php echo $st['paid'] ? 'checked' : ''; ?>
+                                                       onclick="window.location.href='start_times.php?action=toggle_paid&id=<?php echo $st['id']; ?>&csrf_token=<?php echo $csrfToken; ?>'"
+                                                       title="Bezahlstatus ändern">
+                                            <?php else: ?>
+                                                <span style="color: #666;">-</span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td>
                                             <?php if ($st['race_time']): ?>
                                                 <span class="badge badge-success">
@@ -274,6 +321,23 @@ sort($allDates);
                                                         echo htmlspecialchars($raceTime);
                                                     }
                                                     ?>
+                                                </span>
+                                            <?php else: ?>
+                                                <span style="color: #666;">-</span>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td>
+                                            <?php if ($st['team_id'] && $st['notes']): ?>
+                                                <span style="font-size: 0.875rem; color: #666; cursor: pointer;"
+                                                      onclick="showNotesModal(<?php echo $st['id']; ?>, '<?php echo htmlspecialchars(addslashes($st['notes']), ENT_QUOTES); ?>')"
+                                                      title="Notizen anzeigen">
+                                                    <?php echo htmlspecialchars(substr($st['notes'], 0, 20)) . (strlen($st['notes']) > 20 ? '...' : ''); ?>
+                                                </span>
+                                            <?php elseif ($st['team_id']): ?>
+                                                <span style="font-size: 0.875rem; color: #999; cursor: pointer;"
+                                                      onclick="showNotesModal(<?php echo $st['id']; ?>, '')"
+                                                      title="Notizen hinzufügen">
+                                                    + Hinzufügen
                                                 </span>
                                             <?php else: ?>
                                                 <span style="color: #666;">-</span>
@@ -340,6 +404,9 @@ sort($allDates);
                          style="padding: 0.75rem; border-bottom: 1px solid #eee; cursor: pointer;">
                         <strong><?php echo htmlspecialchars($team['name']); ?></strong>
                         <span style="color: #666; margin-left: 1rem;">(<?php echo htmlspecialchars($team['startklasse']); ?>)</span>
+                        <?php if (!empty($team['captain_name'])): ?>
+                            <span style="color: #999; margin-left: 0.5rem;">- <?php echo htmlspecialchars($team['captain_name']); ?></span>
+                        <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -382,6 +449,37 @@ sort($allDates);
                     <small style="color: #666; display: block; margin-top: 0.5rem;">
                         Bitte geben Sie die Zeit im Format Minuten:Sekunden ein (z. B. 45:23).
                     </small>
+                </div>
+                
+                <div style="text-align: right;">
+                    <button type="button" class="btn btn-secondary close-modal" style="margin-right: 1rem;">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">Speichern</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ============================================
+         MODAL: NOTIZEN BEARBEITEN
+         ============================================ -->
+    <div id="notesModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div class="modal-content" style="background: white; margin: 10% auto; padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="margin: 0;">Notizen bearbeiten</h2>
+                <button class="close-modal" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+            
+            <form id="notesForm" method="POST" action="start_times.php">
+                <input type="hidden" name="action" value="save_notes">
+                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                <input type="hidden" name="id" id="notesStartTimeId" value="">
+                
+                <div style="margin-bottom: 1.5rem;">
+                    <label for="notes" style="display: block; margin-bottom: 0.5rem; font-weight: bold;">Notizen:</label>
+                    <textarea id="notes" name="notes" 
+                              style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; min-height: 150px;"
+                              placeholder="Hier können Sie Anmerkungen zur Startzeit eingeben...">
+                    </textarea>
                 </div>
                 
                 <div style="text-align: right;">
@@ -452,6 +550,16 @@ sort($allDates);
                 }
             });
         });
+        
+        // ============================================
+        // NOTIZEN MODAL
+        // ============================================
+        
+        function showNotesModal(startTimeId, currentNotes) {
+            document.getElementById('notesStartTimeId').value = startTimeId;
+            document.getElementById('notes').value = currentNotes;
+            openModal('notesModal');
+        }
         
         // ============================================
         // MANNSCHAFT ZUORDNEN MODAL

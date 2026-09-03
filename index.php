@@ -311,7 +311,7 @@ unset($_SESSION['success']);
                                     <tr>
                                         <td><?php echo htmlspecialchars($team['name']); ?></td>
                                         <td><?php echo htmlspecialchars($team['startklasse']); ?></td>
-                                        <td><?php echo htmlspecialchars($team['kapitaen']); ?></td>
+                                        <td><?php echo htmlspecialchars($team['captain_name'] ?? 'Kein Kapitän'); ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>
