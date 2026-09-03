@@ -95,8 +95,14 @@ if ($action === 'edit' || $action === 'add') {
             // Validierung
             if (empty($data['name'])) {
                 $error = 'Bitte geben Sie einen Kapitänsnamen ein.';
+            } elseif (strlen($data['name']) > 100) {
+                $error = 'Der Name darf maximal 100 Zeichen lang sein.';
             } elseif (!empty($data['email']) && !validateEmail($data['email'])) {
                 $error = 'Bitte geben Sie eine gültige E-Mail-Adresse ein.';
+            } elseif (!empty($data['email']) && strlen($data['email']) > 255) {
+                $error = 'Die E-Mail darf maximal 255 Zeichen lang sein.';
+            } elseif (!empty($data['phone']) && strlen($data['phone']) > 50) {
+                $error = 'Die Telefonnummer darf maximal 50 Zeichen lang sein.';
             }
             
             if (!$error) {

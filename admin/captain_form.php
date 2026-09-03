@@ -70,18 +70,20 @@ $csrfToken = generateCSRFToken();
                     
                     <div class="form-group">
                         <label for="name">Name *</label>
-                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($captain['name']); ?>" required>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($captain['name']); ?>" required maxlength="100">
+                        <small>Maximal 100 Zeichen erlaubt.</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="email">E-Mail (optional)</label>
-                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($captain['email']); ?>" placeholder="z. B. kapitaen@example.com">
-                        <small>Diese E-Mail wird nicht öffentlich angezeigt.</small>
+                        <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($captain['email']); ?>" placeholder="z. B. kapitaen@example.com" maxlength="255">
+                        <small>Diese E-Mail wird nicht öffentlich angezeigt. Maximal 255 Zeichen.</small>
                     </div>
                     
                     <div class="form-group">
                         <label for="phone">Telefon (optional)</label>
-                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($captain['phone']); ?>" placeholder="z. B. 01234 56789">
+                        <input type="text" id="phone" name="phone" value="<?php echo htmlspecialchars($captain['phone']); ?>" placeholder="z. B. 01234 56789" maxlength="50">
+                        <small>Maximal 50 Zeichen erlaubt.</small>
                     </div>
                     
                     <div class="form-actions">
