@@ -148,8 +148,9 @@ unset($_SESSION['success']);
                 </div>
                 <div class="card-body">
                     <a href="/admin/teams.php?action=add" class="btn btn-success">Neue Mannschaft</a>
-                    <a href="start_times.php?action=reset" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
+                    <a href="/admin/settings.php" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
                     <a href="/admin/export.php" class="btn btn-info">Daten exportieren</a>
+                    <a href="/admin/users.php" class="btn btn-danger">Benutzer verwalten</a>
                 </div>
             </div>
         </div>
