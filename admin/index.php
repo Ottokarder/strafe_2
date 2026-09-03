@@ -182,7 +182,7 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear_old_race') {
                     <a href="/admin/settings.php" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
                     <a href="/admin/export.php" class="btn btn-info">Daten exportieren</a>
                     <a href="/admin/users.php" class="btn btn-danger">Benutzer verwalten</a>
-                    <a href="index.php?action=clear_old_race&csrf_token=<?php echo $csrfToken; ?>" class="btn btn-danger" onclick="return confirm('Altes Rennen löschen? Alle Mannschaften, Ergebnisse und Audit-Logs werden gelöscht und IDs zurückgesetzt!')">Altes Rennen löschen</a>
+                    <a href="index.php?action=clear_old_race&csrf_token=<?php echo $csrfToken; ?>" class="btn btn-warning" onclick="return confirm('Altes Rennen löschen? Alle Mannschaften, Ergebnisse und Audit-Logs werden gelöscht und IDs zurückgesetzt!')">Altes Rennen löschen</a>
                 </div>
             </div>
         </div>
