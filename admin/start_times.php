@@ -7,7 +7,8 @@
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
-// Session starten, falls noch nicht geschehen
+// Session sollte bereits durch config.php gestartet sein
+// Falls nicht, hier als Fallback
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
