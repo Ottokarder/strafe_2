@@ -7,6 +7,11 @@
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 
+// Session starten, falls noch nicht geschehen
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Zugriff prüfen
 if (!isAdmin()) {
     redirectToLogin('Sie haben keine Berechtigung für diese Seite.');
