@@ -40,6 +40,37 @@ unset($_SESSION['error']);
 $success = $_SESSION['success'] ?? null;
 unset($_SESSION['success']);
 
+// CSRF-Token generieren
+$csrfToken = generateCSRFToken();
+
+// Altes Rennen löschen - Action
+if (isset($_GET['action']) && $_GET['action'] === 'clear_old_race') {
+    if (!isset($_GET['csrf_token']) || !validateCSRFToken($_GET['csrf_token'])) {
+        redirectWithError('index.php', 'Ungültiges CSRF-Token.');
+    }
+    
+    $conn = getDBConnection();
+    beginTransaction();
+    
+    try {
+        // Tabellen löschen (außer users und settings)
+        execute("DELETE FROM audit_log");
+        execute("DELETE FROM results");
+        execute("DELETE FROM teams");
+        
+        // Auto-Increment-IDs zurücksetzen
+        execute("ALTER TABLE audit_log AUTO_INCREMENT = 1");
+        execute("ALTER TABLE results AUTO_INCREMENT = 1");
+        execute("ALTER TABLE teams AUTO_INCREMENT = 1");
+        
+        commitTransaction();
+        redirectWithSuccess('index.php', 'Altes Rennen gelöscht. Alle Mannschaften, Ergebnisse und Audit-Logs wurden zurückgesetzt.');
+    } catch (Exception $e) {
+        rollbackTransaction();
+        redirectWithError('index.php', 'Fehler beim Löschen des alten Rennens: ' . $conn->error);
+    }
+}
+
 ?>
 <?php include __DIR__ . '/../includes/header.php'; ?>
 
@@ -151,6 +182,7 @@ unset($_SESSION['success']);
                     <a href="/admin/settings.php" class="btn btn-warning" onclick="return confirm('Alle Startzeiten zurücksetzen?')">Startzeiten zurücksetzen</a>
                     <a href="/admin/export.php" class="btn btn-info">Daten exportieren</a>
                     <a href="/admin/users.php" class="btn btn-danger">Benutzer verwalten</a>
+                    <a href="index.php?action=clear_old_race&csrf_token=<?php echo $csrfToken; ?>" class="btn btn-danger" onclick="return confirm('Altes Rennen löschen? Alle Mannschaften, Ergebnisse und Audit-Logs werden gelöscht und IDs zurückgesetzt!')">Altes Rennen löschen</a>
                 </div>
             </div>
         </div>
