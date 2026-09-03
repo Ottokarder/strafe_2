@@ -111,8 +111,12 @@ if ($action === 'edit' || $action === 'add') {
                     $captainId = createCaptain($data);
                     logAudit('INSERT', 'captains', $captainId, [], $data);
                     
-                    // Zurück zur ursprünglichen Seite
-                    $returnUrl = $returnTo ? '/admin/' . $returnTo . '.php' : '/admin/captains.php';
+                    // Zurück zur ursprünglichen Seite mit dem neuen Kapitän-Parameter
+                    if ($returnTo === 'teams') {
+                        $returnUrl = '/admin/team_form.php?action=add&captain_id=' . $captainId . '&new_captain=1';
+                    } else {
+                        $returnUrl = $returnTo ? '/admin/' . $returnTo . '.php' : '/admin/captains.php';
+                    }
                     redirectWithSuccess($returnUrl, 'Kapitän erfolgreich erstellt.');
                 } else {
                     // Kapitän aktualisieren

@@ -19,6 +19,8 @@ if (!isAdmin()) {
 // Aktuelle Aktion abrufen
 $action = $_GET['action'] ?? '';
 $teamId = $_GET['id'] ?? null;
+$newCaptainId = $_GET['captain_id'] ?? null;
+$newCaptainCreated = $_GET['new_captain'] ?? null;
 
 // Standardwerte für neues Team
 if ($action === 'add') {
@@ -26,10 +28,15 @@ if ($action === 'add') {
         'id' => null,
         'name' => '',
         'startklasse' => '',
-        'captain_id' => null,
+        'captain_id' => $newCaptainId ?: null,
         'captain_name' => '',
         'captain_email' => ''
     ];
+    
+    // Erfolgsmeldung anzeigen, wenn ein neuer Kapitän erstellt wurde
+    if ($newCaptainCreated && $newCaptainId) {
+        $success = 'Neuer Kapitän wurde erstellt und ausgewählt.';
+    }
 } else {
     // Team-Daten abrufen
     $team = getTeamById($teamId);
@@ -62,6 +69,12 @@ $csrfToken = generateCSRFToken();
             </div>
         <?php endif; ?>
         
+        <?php if ($success): ?>
+            <div class="alert alert-success">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+        <?php endif; ?>
+        
         <div class="card">
             <div class="card-header">
                 <h3><?php echo $action === 'add' ? 'Neue Mannschaft' : 'Mannschaft bearbeiten'; ?></h3>
@@ -72,7 +85,8 @@ $csrfToken = generateCSRFToken();
                     
                     <div class="form-group">
                         <label for="name">Mannschaftsname *</label>
-                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($team['name']); ?>" required>
+                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($team['name']); ?>" required maxlength="100">
+                        <small>Maximal 100 Zeichen erlaubt.</small>
                     </div>
                     
                     <div class="form-group">
@@ -103,7 +117,7 @@ $csrfToken = generateCSRFToken();
                             <?php endforeach; ?>
                         </select>
                         <small>
-                            <a href="/admin/captains.php?action=add&return_to=teams" style="color: #007bff;">Neuen Kapitän hinzufügen</a>
+                            <a href="/admin/captains.php?action=add&return_to=teams" style="color: #007bff;" onclick="window.open(this.href, '_blank'); return false;">Neuen Kapitän hinzufügen</a>
                         </small>
                     </div>
                     
@@ -117,5 +131,13 @@ $csrfToken = generateCSRFToken();
             </div>
         </div>
     </div>
+    
+    <script>
+        // Öffnet den Link zum Hinzufügen eines neuen Kapitäns in einem neuen Tab
+        // und aktualisiert die Kapitän-Liste nach dem Schließen
+        function openCaptainForm() {
+            window.open('/admin/captains.php?action=add&return_to=teams', '_blank', 'width=600,height=400');
+        }
+    </script>
     
     <?php include __DIR__ . '/../includes/footer.php'; ?>

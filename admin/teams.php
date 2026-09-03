@@ -85,8 +85,18 @@ if ($action === 'edit' || $action === 'add') {
             // Validierung
             if (empty($data['name'])) {
                 $error = 'Bitte geben Sie einen Mannschaftsnamen ein.';
+            } elseif (strlen($data['name']) > 100) {
+                $error = 'Der Mannschaftsname darf maximal 100 Zeichen lang sein.';
             } elseif (empty($data['captain_id'])) {
                 $error = 'Bitte wählen Sie einen Kapitän aus.';
+            }
+            
+            // Prüfen, ob Mannschaftsname bereits existiert (außer bei Bearbeiten)
+            if (!$error && $action === 'add') {
+                $existingTeam = fetchOne("SELECT id FROM teams WHERE name = ?", "s", [$data['name']]);
+                if ($existingTeam) {
+                    $error = 'Eine Mannschaft mit diesem Namen existiert bereits.';
+                }
             }
             
             if (!$error) {
