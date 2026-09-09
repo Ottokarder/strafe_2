@@ -16,18 +16,32 @@
 -- Import: phpMyAdmin -> SQL-Tab importieren.
 -- =====================================================================
 
-USE `strafe_2`;
+-- WICHTIG: Datenbanknamen an deine Umgebung anpassen.
+-- In der Fehlermeldung war die DB 'strafe2_tst' zu sehen; trage hier den
+-- tatsächlichen Namen deiner phpMyAdmin-Datenbank ein (oder kommentiere die
+-- USE-Zeile aus, wenn die richtige DB in phpMyAdmin bereits ausgewählt ist).
+USE `strafe2_tst`;
 
 -- ---------------------------------------------------------------------
 -- 1) Vorhandene Daten löschen (Tabellenstruktur bleibt erhalten)
 -- ---------------------------------------------------------------------
+-- Hinweis: TRUNCATE funktioniert bei Tabellen mit Foreign-Key-Beziehungen
+-- (z.B. start_times <- results) auch mit FOREIGN_KEY_CHECKS=0 in MariaDB
+-- nicht zuverlässig. Daher DELETE mit anschließendem AUTO_INCREMENT-Reset,
+-- genau wie die Anwendung selbst in resetAllStartTimes().
 SET FOREIGN_KEY_CHECKS = 0;
 
-TRUNCATE TABLE `results`;
-TRUNCATE TABLE `start_times`;
-TRUNCATE TABLE `teams`;
-TRUNCATE TABLE `captains`;
-TRUNCATE TABLE `audit_log`;
+DELETE FROM `results`;
+DELETE FROM `start_times`;
+DELETE FROM `teams`;
+DELETE FROM `captains`;
+DELETE FROM `audit_log`;
+
+ALTER TABLE `results`     AUTO_INCREMENT = 1;
+ALTER TABLE `start_times` AUTO_INCREMENT = 1;
+ALTER TABLE `teams`       AUTO_INCREMENT = 1;
+ALTER TABLE `captains`    AUTO_INCREMENT = 1;
+ALTER TABLE `audit_log`   AUTO_INCREMENT = 1;
 
 SET FOREIGN_KEY_CHECKS = 1;
 
