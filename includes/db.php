@@ -699,12 +699,13 @@ function exportStartTimesToCSV() {
  */
 function exportTeamsToCSV() {
     $results = fetchAll("SELECT 
-                name AS 'Mannschaft',
-                startklasse AS 'Startklasse',
-                kapitaen AS 'Kapitän',
-                email AS 'E-Mail'
-              FROM teams 
-              ORDER BY startklasse, name");
+                t.name AS 'Mannschaft',
+                t.startklasse AS 'Startklasse',
+                c.name AS 'Kapitän',
+                c.email AS 'E-Mail'
+              FROM teams t
+              LEFT JOIN captains c ON t.captain_id = c.id
+              ORDER BY t.startklasse, t.name");
     
     if (empty($results)) {
         return "Keine Mannschaften gefunden\n";
