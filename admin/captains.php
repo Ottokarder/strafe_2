@@ -176,6 +176,11 @@ foreach ($captains as $key => $captain) {
                 <?php if (empty($captains)): ?>
                     <p>Keine Kapitäne gefunden. <a href="?action=add">Ersten Kapitän hinzufügen</a></p>
                 <?php else: ?>
+                    <div class="filter-bar">
+                        <form method="GET" action="captains.php" onsubmit="return false;">
+                            <input type="text" id="captain-filter" name="filter" placeholder="Kapitän suchen (Name, E-Mail, Telefon)..." autocomplete="off">
+                        </form>
+                    </div>
                     <table class="table">
                         <thead>
                             <tr>
@@ -188,7 +193,7 @@ foreach ($captains as $key => $captain) {
                         </thead>
                         <tbody>
                             <?php foreach ($captains as $captain): ?>
-                                <tr>
+                                <tr data-search="<?php echo htmlspecialchars(strtolower($captain['name'] . ' ' . ($captain['email'] ?? '') . ' ' . ($captain['phone'] ?? ''))); ?>">
                                     <td><?php echo htmlspecialchars($captain['name']); ?></td>
                                     <td><?php echo htmlspecialchars($captain['email'] ?? '-'); ?></td>
                                     <td><?php echo htmlspecialchars($captain['phone'] ?? '-'); ?></td>
@@ -211,5 +216,20 @@ foreach ($captains as $key => $captain) {
             </div>
         </div>
     </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('captain-filter');
+        if (!input) return;
+        var rows = document.querySelectorAll('table.table tbody tr');
+        input.addEventListener('input', function() {
+            var term = this.value.toLowerCase().trim();
+            rows.forEach(function(row) {
+                var text = row.getAttribute('data-search') || '';
+                row.style.display = (text.indexOf(term) === -1) ? 'none' : '';
+            });
+        });
+    });
+    </script>
     
     <?php include __DIR__ . '/../includes/footer.php'; ?>

@@ -165,6 +165,11 @@ foreach ($teams as $key => $team) {
                 <?php if (empty($teams)): ?>
                     <p>Keine Mannschaften gefunden. <a href="?action=add">Erste Mannschaft hinzufügen</a></p>
                 <?php else: ?>
+                    <div class="filter-bar">
+                        <form method="GET" action="teams.php" onsubmit="return false;">
+                            <input type="text" id="team-filter" name="filter" placeholder="Mannschaft oder Kapitän suchen..." autocomplete="off">
+                        </form>
+                    </div>
                     <table class="table">
                         <thead>
                             <tr>
@@ -177,7 +182,7 @@ foreach ($teams as $key => $team) {
                         </thead>
                         <tbody>
                             <?php foreach ($teams as $team): ?>
-                                <tr>
+                                <tr data-search="<?php echo htmlspecialchars(strtolower($team['name'] . ' ' . ($team['captain_name'] ?? '') . ' ' . ($team['captain_email'] ?? '') . ' ' . ($team['startklasse'] ?? ''))); ?>">
                                     <td><?php echo htmlspecialchars($team['name']); ?></td>
                                     <td><?php echo htmlspecialchars($team['startklasse']); ?></td>
                                     <td>
@@ -201,5 +206,20 @@ foreach ($teams as $key => $team) {
             </div>
         </div>
     </div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var input = document.getElementById('team-filter');
+        if (!input) return;
+        var rows = document.querySelectorAll('table.table tbody tr');
+        input.addEventListener('input', function() {
+            var term = this.value.toLowerCase().trim();
+            rows.forEach(function(row) {
+                var text = row.getAttribute('data-search') || '';
+                row.style.display = (text.indexOf(term) === -1) ? 'none' : '';
+            });
+        });
+    });
+    </script>
     
     <?php include __DIR__ . '/../includes/footer.php'; ?>

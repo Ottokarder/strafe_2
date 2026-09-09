@@ -24,6 +24,7 @@ $user = getCurrentUser();
 
 // Statistiken abrufen
 $teamCount = fetchOne("SELECT COUNT(*) as count FROM teams");
+$captainCount = fetchOne("SELECT COUNT(*) as count FROM captains");
 $startTimeCount = fetchOne("SELECT COUNT(*) as count FROM start_times WHERE is_booked = TRUE");
 $freeStartTimes = fetchOne("SELECT COUNT(*) as count FROM start_times WHERE is_booked = FALSE");
 
@@ -105,6 +106,16 @@ if (isset($_GET['action']) && $_GET['action'] === 'clear_old_race') {
                 </div>
             </div>
             
+            <div class="card">
+                <div class="card-header">
+                    <h3>Kapitäne</h3>
+                </div>
+                <div class="card-body">
+                    <p class="stat-number"><?php echo $captainCount['count']; ?></p>
+                    <p>angelegte Kapitäne</p>
+                    <a href="/admin/captains.php" class="btn btn-primary">Verwalten</a>
+                </div>
+            </div>
 
             <div class="card">
                 <div class="card-header">
